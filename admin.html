@@ -331,19 +331,19 @@
             <div class="form-section-title">Basic Info</div>
             <div class="form-grid">
               <div class="field">
-                <label>Price *</label>
+                <label>Price</label>
                 <input id="f-price" placeholder="$389,000">
               </div>
               <div class="field">
-                <label>Min. Deposit *</label>
+                <label>Min. Deposit</label>
                 <input id="f-deposit" placeholder="$5,000">
               </div>
               <div class="field form-full">
-                <label>Address / Description *</label>
+                <label>Address / Description</label>
                 <input id="f-address" placeholder="e.g. Sugar Land · Houston, TX">
               </div>
               <div class="field">
-                <label>Market *</label>
+                <label>Market</label>
                 <select id="f-market">
                   <option value="DFW">DFW</option>
                   <option value="Houston">Houston</option>
@@ -770,10 +770,6 @@ async function saveProperty() {
   const deposit = document.getElementById('f-deposit').value.trim();
   const address = document.getElementById('f-address').value.trim();
 
-  if (!price || !deposit || !address) {
-    toast('Price, deposit, and address are required.', 'error'); return;
-  }
-
   // Button → saving state
   const btn = document.getElementById('saveBtn');
   btn.textContent = '⏳ Saving…';
@@ -805,11 +801,11 @@ async function saveProperty() {
 
   const prop = {
     id: editId ? parseInt(editId) : Date.now(),
-    tag: document.getElementById('f-tag').value.trim() || market,
-    badge: deposit + ' Deposit',
-    price,
-    deposit,
-    address,
+    tag: document.getElementById('f-tag').value.trim() || market || 'Listing',
+    badge: deposit ? deposit + ' Deposit' : '',
+    price: price || 'Contact for Price',
+    deposit: deposit || 'Contact Agent',
+    address: address || 'Location TBD',
     area: document.getElementById('f-area').value.trim(),
     market,
     status: document.getElementById('f-status').value,
