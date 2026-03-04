@@ -410,18 +410,36 @@ async function loadProperty() {
   app.innerHTML = `<div style="text-align:center;padding:120px 40px;color:var(--soft);font-size:0.85rem;letter-spacing:0.12em;text-transform:uppercase;">Loading property…</div>`;
 
   try {
-    // Fetch the property + all properties (for similar)
-    const [propRes, allRes] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/properties?id=eq.${id}`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }),
-      fetch(`${SUPABASE_URL}/rest/v1/properties?order=id.asc`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } })
-    ]);
+    const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` };
 
-    const [propArr, allArr] = await Promise.all([propRes.json(), allRes.json()]);
+    // Fetch all properties first (needed for similar section)
+    const allRes = await fetch(`${SUPABASE_URL}/rest/v1/properties?order=id.asc`, { headers });
+    if (!allRes.ok) throw new Error(`Supabase error ${allRes.status}: ${await allRes.text()}`);
+    const allArr = await allRes.json();
     ALL_PROPERTIES = allArr.map(normalise);
-    const prop = propArr[0] ? normalise(propArr[0]) : null;
+
+    // Find the property by id from the full list (avoids type mismatch issues)
+    const prop = ALL_PROPERTIES.find(p => String(p.id) === String(id)) || null;
+
+    if (!prop) {
+      app.innerHTML = `
+        <div class="not-found">
+          <h2>Property Not Found</h2>
+          <p>This listing may have been removed or the link is incorrect.</p>
+          <a href="listings.html" class="btn-primary" style="display:inline-block;padding:14px 32px;">← Back to Listings</a>
+        </div>`;
+      return;
+    }
+
     render(prop);
   } catch(e) {
-    app.innerHTML = `<div class="not-found"><h2>Failed to load property.</h2><p>Please check your connection and try again.</p><a href="listings.html" class="btn-primary" style="display:inline-block;padding:14px 32px;">← Back to Listings</a></div>`;
+    console.error('loadProperty failed:', e);
+    app.innerHTML = `
+      <div class="not-found">
+        <h2>Failed to load property.</h2>
+        <p>${e.message || 'Please check your connection and try again.'}</p>
+        <a href="listings.html" class="btn-primary" style="display:inline-block;padding:14px 32px;">← Back to Listings</a>
+      </div>`;
   }
 }
 
