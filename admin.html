@@ -172,11 +172,58 @@
   .how-body { font-size:0.82rem; color:var(--muted); line-height:1.65; }
   .how-body code { background:var(--panel); color:var(--gold); padding:2px 7px; font-size:0.78rem; }
 
+  /* ── UPLOAD ── */
+  .upload-zone { border:2px dashed var(--border); padding:28px 20px; text-align:center; cursor:pointer; transition:all 0.25s; position:relative; margin-bottom:10px; }
+  .upload-zone:hover, .upload-zone.dragover { border-color:var(--gold); background:var(--gold-dim); }
+  .upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .upload-zone-icon { font-size:1.8rem; margin-bottom:8px; }
+  .upload-zone-text { font-size:0.8rem; color:var(--muted); }
+  .upload-zone-text strong { color:var(--gold); }
+  .upload-progress { height:3px; background:var(--border); margin-top:8px; overflow:hidden; display:none; }
+  .upload-progress-bar { height:100%; background:var(--gold); width:0%; transition:width 0.3s; }
+  .img-input-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+  .img-input-row input { flex:1; min-width:0; }
+  .img-preview { width:44px; height:34px; object-fit:cover; border:1px solid var(--border); flex-shrink:0; background:var(--panel); display:flex; align-items:center; justify-content:center; font-size:0.6rem; color:var(--muted); overflow:hidden; border-radius:2px; }
+  .img-preview img { width:100%; height:100%; object-fit:cover; }
+  .add-img-btn { background:none; border:1px dashed var(--border); color:var(--muted); font-family:'Outfit',sans-serif; font-size:0.72rem; padding:8px 16px; cursor:pointer; transition:all 0.2s; margin-top:4px; width:100%; }
+  .add-img-btn:hover { border-color:var(--gold); color:var(--gold); }
+
+  /* ── MOBILE RESPONSIVE ── */
   @media(max-width:900px) {
     .app { grid-template-columns:1fr; }
     .sidebar { display:none; }
     .stats-row { grid-template-columns:1fr 1fr; }
     .form-grid, .form-grid-3 { grid-template-columns:1fr; }
+    .topbar { padding:0 16px; }
+    .topbar-actions .btn-outline { display:none; }
+    .content { padding:20px 16px; }
+    .table-header { flex-direction:column; align-items:flex-start; gap:10px; }
+    .search-box { width:100%; }
+    td, th { padding:10px 12px; }
+    .td-img { width:40px; height:32px; }
+    th:nth-child(4), td:nth-child(4),
+    th:nth-child(5), td:nth-child(5) { display:none; }
+    .form-section { padding:20px 16px; }
+    .how-card { flex-direction:column; gap:8px; padding:18px 16px; }
+    .video-type-row { flex-wrap:wrap; }
+    .video-type-btn { flex:1 1 calc(50% - 5px); }
+    .modal { padding:24px 20px; }
+
+    /* Mobile bottom nav bar */
+    .mobile-nav { display:flex; position:fixed; bottom:0; left:0; right:0; background:var(--panel); border-top:1px solid var(--border); z-index:100; padding:8px 0 12px; }
+    .mobile-nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:6px 4px; color:var(--muted); font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; transition:color 0.2s; border:none; background:none; font-family:'Outfit',sans-serif; }
+    .mobile-nav-item.active { color:var(--gold); }
+    .mobile-nav-item .m-icon { font-size:1.2rem; }
+    .content { padding-bottom:80px; }
+  }
+  @media(min-width:901px) {
+    .mobile-nav { display:none; }
+  }
+  @media(max-width:480px) {
+    .stats-row { grid-template-columns:1fr 1fr; gap:10px; }
+    .stat-card { padding:16px; }
+    .stat-val { font-size:1.6rem; }
+    td:nth-child(6), th:nth-child(6) { display:none; }
   }
 </style>
 </head>
@@ -339,9 +386,9 @@
                 <input id="f-garage" type="number" placeholder="2">
               </div>
               <div class="field">
-                <label>Map Search Query</label>
-                <input id="f-mapQuery" placeholder="e.g. Sugar+Land+Texas">
-                <div class="field-hint">Used for Google Maps embed. Use + instead of spaces.</div>
+                <label>Location / Area</label>
+                <input id="f-mapQuery" placeholder="e.g. Sugar Land, Texas or 123 Main St, Forney TX 75126">
+                <div class="field-hint">Type any address or area — shown on Google Maps on the property page.</div>
               </div>
             </div>
           </div>
@@ -356,9 +403,20 @@
 
           <div class="form-section">
             <div class="form-section-title">Photos</div>
+            <!-- Upload Zone -->
+            <div class="upload-zone" id="uploadZone">
+              <input type="file" accept="image/*" multiple onchange="handleFileUpload(this.files)" id="fileInput">
+              <div class="upload-zone-icon">📸</div>
+              <div class="upload-zone-text">
+                <strong>Tap to upload photos</strong> from your phone or computer<br>
+                <span style="font-size:0.72rem;opacity:0.6">JPG, PNG, WEBP supported · Multiple files at once</span>
+              </div>
+              <div class="upload-progress" id="uploadProgress">
+                <div class="upload-progress-bar" id="uploadBar"></div>
+              </div>
+            </div>
             <div class="img-inputs" id="imgInputs"></div>
-            <button class="add-img-btn" onclick="addImageField()">+ Add Another Photo URL</button>
-            <div class="field-hint" style="margin-top:8px">Paste image URLs (Unsplash, your CDN, Google Drive direct links, etc.)</div>
+            <button class="add-img-btn" onclick="addImageField()">+ Add Photo by URL instead</button>
           </div>
 
           <div class="form-section">
@@ -445,7 +503,21 @@
   </div><!-- /main -->
 </div><!-- /app -->
 
-<!-- DELETE MODAL -->
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-item active" onclick="showView('dashboard'); setMobileNav(this)">
+    <span class="m-icon">📊</span>Dashboard
+  </button>
+  <button class="mobile-nav-item" onclick="showView('properties'); setMobileNav(this)">
+    <span class="m-icon">🏠</span>Listings
+  </button>
+  <button class="mobile-nav-item" onclick="showView('add'); initForm(); setMobileNav(this)">
+    <span class="m-icon">➕</span>Add
+  </button>
+  <button class="mobile-nav-item" onclick="showView('howto'); setMobileNav(this)">
+    <span class="m-icon">📖</span>Help
+  </button>
+</nav>
 <div class="modal-overlay" id="deleteModal">
   <div class="modal">
     <div class="modal-title">Delete Property?</div>
@@ -737,8 +809,8 @@ async function saveProperty() {
     baths: parseFloat(document.getElementById('f-baths').value) || 0,
     sqft: document.getElementById('f-sqft').value.trim(),
     garage: parseInt(document.getElementById('f-garage').value) || 0,
-    map_query: document.getElementById('f-mapQuery').value.trim(),
-    mapQuery: document.getElementById('f-mapQuery').value.trim(),
+    map_query: document.getElementById('f-mapQuery').value.trim().replace(/\s+/g, '+'),
+    mapQuery: document.getElementById('f-mapQuery').value.trim().replace(/\s+/g, '+'),
     description: document.getElementById('f-description').value.trim(),
     features,
     images: images.length ? images : [],
@@ -853,6 +925,63 @@ function attemptLogin() {
     document.getElementById('loginPass').focus();
   }
 }
+
+// ═══ MOBILE NAV ═══
+function setMobileNav(el) {
+  document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ═══ IMAGE UPLOAD ═══
+async function handleFileUpload(files) {
+  if (!files.length) return;
+  const progress = document.getElementById('uploadProgress');
+  const bar = document.getElementById('uploadBar');
+  progress.style.display = 'block';
+  const total = files.length;
+  let done = 0;
+
+  for (const file of files) {
+    try {
+      const base64 = await fileToBase64(file);
+      addImageField(base64); // embed as base64 directly
+    } catch(e) {
+      toast('Could not read file: ' + file.name, 'error');
+    }
+    done++;
+    bar.style.width = `${(done / total) * 100}%`;
+  }
+
+  setTimeout(() => {
+    progress.style.display = 'none';
+    bar.style.width = '0%';
+    toast(`${total} photo${total > 1 ? 's' : ''} added!`, 'success');
+  }, 600);
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Drag and drop support
+setTimeout(() => {
+  const zone = document.getElementById('uploadZone');
+  if (!zone) return;
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    handleFileUpload(e.dataTransfer.files);
+  });
+}, 500);
+
+// ═══ AUTH ═══
 
 function checkAuth() {
   if (sessionStorage.getItem(SESSION_KEY) === 'true') {
