@@ -133,20 +133,20 @@
   .sidebar-ig:hover { color:var(--gold); }
 
   /* LIGHTBOX CAROUSEL */
-  .lightbox { position:fixed; inset:0; background:rgba(0,0,0,0.96); z-index:999; display:none; flex-direction:column; align-items:center; justify-content:center; }
+  .lightbox { position:fixed; inset:0; background:rgba(0,0,0,0.96); z-index:999; display:none; flex-direction:column; }
   .lightbox.open { display:flex; }
-  .lightbox-close { position:absolute; top:18px; right:22px; background:none; border:none; color:white; font-size:2rem; cursor:pointer; opacity:0.6; transition:opacity 0.2s; z-index:10; line-height:1; padding:4px 8px; }
+  .lightbox-close { position:absolute; top:18px; right:22px; background:none; border:none; color:white; font-size:2rem; cursor:pointer; opacity:0.6; transition:opacity 0.2s; z-index:20; line-height:1; padding:4px 8px; }
   .lightbox-close:hover { opacity:1; }
-  .lightbox-track-wrap { width:100%; flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; }
-  .lightbox-track { display:flex; height:100%; transition:transform 0.38s cubic-bezier(0.25,0.46,0.45,0.94); will-change:transform; }
-  .lightbox-slide { flex:0 0 100vw; height:100%; display:flex; align-items:center; justify-content:center; padding:60px 72px; }
-  .lightbox-slide img { max-width:100%; max-height:85vh; object-fit:contain; display:block; user-select:none; border:none; }
+  .lightbox-track-wrap { flex:1; position:relative; overflow:hidden; width:100%; }
+  .lightbox-track { display:flex; height:100%; width:100%; transition:transform 0.38s cubic-bezier(0.25,0.46,0.45,0.94); will-change:transform; }
+  .lightbox-slide { flex:0 0 100%; width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:56px 72px 20px; }
+  .lightbox-slide img { max-width:100%; max-height:100%; object-fit:contain; display:block; user-select:none; pointer-events:none; }
   .lightbox-prev, .lightbox-next { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.08); border:none; color:white; font-size:1.3rem; width:52px; height:52px; cursor:pointer; transition:background 0.2s; display:flex; align-items:center; justify-content:center; z-index:10; backdrop-filter:blur(4px); }
   .lightbox-prev:hover, .lightbox-next:hover { background:rgba(201,168,76,0.6); }
   .lightbox-prev { left:14px; }
   .lightbox-next { right:14px; }
-  .lightbox-footer { padding:16px 0 20px; display:flex; flex-direction:column; align-items:center; gap:12px; }
-  .lightbox-dots { display:flex; gap:8px; }
+  .lightbox-footer { padding:14px 0 20px; display:flex; flex-direction:column; align-items:center; gap:10px; flex-shrink:0; }
+  .lightbox-dots { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; padding:0 20px; }
   .lightbox-dot { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.25); border:none; cursor:pointer; padding:0; transition:all 0.25s; }
   .lightbox-dot.active { background:var(--gold); transform:scale(1.3); }
   .lightbox-counter { color:rgba(255,255,255,0.4); font-size:0.72rem; letter-spacing:0.16em; text-transform:uppercase; }
@@ -531,11 +531,19 @@ function lightboxGo(i) {
 
 function updateLightbox(animate) {
   const track = document.getElementById('lightboxTrack');
+  const slideWidth = track.parentElement.offsetWidth;
   track.style.transition = animate ? 'transform 0.38s cubic-bezier(0.25,0.46,0.45,0.94)' : 'none';
-  track.style.transform = `translateX(-${lightboxIndex * 100}vw)`;
+  track.style.transform = `translateX(-${lightboxIndex * slideWidth}px)`;
   document.querySelectorAll('.lightbox-dot').forEach((d, i) => d.classList.toggle('active', i === lightboxIndex));
   document.getElementById('lightboxCounter').textContent = `${lightboxIndex + 1} / ${lightboxImages.length}`;
 }
+
+// Recalculate on resize / orientation change
+window.addEventListener('resize', () => {
+  if (document.getElementById('lightbox').classList.contains('open')) {
+    updateLightbox(false);
+  }
+});
 
 // Keyboard support
 document.addEventListener('keydown', e => {
