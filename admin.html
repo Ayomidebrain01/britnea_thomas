@@ -648,6 +648,7 @@ function rowHTML(p, showActions = false) {
     <td>${p.deposit}</td>
     ${showActions ? `<td><div class="td-actions">
       <button class="btn btn-outline btn-sm" onclick="editProperty(${p.id})">Edit</button>
+      <button class="btn btn-outline btn-sm" onclick="duplicateProperty(${p.id})" style="color:var(--gold);border-color:rgba(201,168,76,0.3)">Copy</button>
       <button class="btn btn-danger btn-sm" onclick="promptDelete(${p.id})">Delete</button>
     </div></td>` : '<td></td>'}
   </tr>`;
@@ -871,6 +872,29 @@ async function editProperty(id) {
   showView('add');
   setTimeout(() => initForm(prop), 50);
   document.getElementById('topbarTitle').textContent = 'Edit Property';
+}
+
+async function duplicateProperty(id) {
+  const props = await db.getAll();
+  const original = props.find(p => p.id === id);
+  if (!original) return;
+
+  // Clone with new id and a "Copy of" label
+  const copy = {
+    ...original,
+    id: Date.now(),
+    tag: 'Copy of ' + (original.tag || original.market),
+    address: original.address + ' (Copy)'
+  };
+
+  const ok = await db.insert(copy);
+  if (ok) {
+    toast('Property duplicated! Edit it in the list.', 'success');
+    renderTable();
+    renderDashboard();
+  } else {
+    toast('Duplicate failed. Try again.', 'error');
+  }
 }
 
 // ═══════════════════════════════════════════════
