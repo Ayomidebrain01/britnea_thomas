@@ -172,6 +172,9 @@
   .how-body { font-size:0.82rem; color:var(--muted); line-height:1.65; }
   .how-body code { background:var(--panel); color:var(--gold); padding:2px 7px; font-size:0.78rem; }
 
+  .btn-saved { background:#52C97A !important; color:white !important; cursor:default !important; }
+  .btn-saving { opacity:0.7; cursor:wait !important; }
+
   /* ── UPLOAD ── */
   .upload-zone { border:2px dashed var(--border); padding:28px 20px; text-align:center; cursor:pointer; transition:all 0.25s; position:relative; margin-bottom:10px; }
   .upload-zone:hover, .upload-zone.dragover { border-color:var(--gold); background:var(--gold-dim); }
@@ -441,7 +444,7 @@
           </div>
 
           <div style="display:flex; gap:12px; margin-top:8px;">
-            <button class="btn btn-gold" onclick="saveProperty()" style="flex:1">💾 Save Property</button>
+            <button class="btn btn-gold" id="saveBtn" onclick="saveProperty()" style="flex:1">💾 Save Property</button>
             <button class="btn btn-outline" onclick="showView('properties')">Cancel</button>
           </div>
           <input type="hidden" id="f-editId">
@@ -771,6 +774,12 @@ async function saveProperty() {
     toast('Price, deposit, and address are required.', 'error'); return;
   }
 
+  // Button → saving state
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = '⏳ Saving…';
+  btn.classList.add('btn-saving');
+  btn.disabled = true;
+
   const images = [...document.querySelectorAll('#imgInputs input')]
     .map(i => i.value.trim()).filter(Boolean);
 
@@ -793,7 +802,6 @@ async function saveProperty() {
   });
 
   const editId = document.getElementById('f-editId').value;
-  const props = getProperties();
 
   const prop = {
     id: editId ? parseInt(editId) : Date.now(),
@@ -819,26 +827,44 @@ async function saveProperty() {
     tags
   };
 
-  if (editId) {
-    const idx = props.findIndex(p => p.id === parseInt(editId));
-    if (idx > -1) props[idx] = prop; else props.push(prop);
-  } else {
-    props.push(prop);
-  }
-
   let ok;
   if (editId) {
     ok = await db.update(parseInt(editId), prop);
   } else {
     ok = await db.insert(prop);
   }
+
   if (ok) {
-    document.getElementById('f-editId').value = '';
+    // Button → saved state
+    btn.textContent = '✅ Saved!';
+    btn.classList.remove('btn-saving');
+    btn.classList.add('btn-saved');
+    btn.disabled = false;
+    document.getElementById('f-editId').value = prop.id;
     toast(editId ? 'Property updated!' : 'Property added!', 'success');
-    showView('properties');
+
+    // Watch for any field change → reset button back to Save
+    watchForChanges();
   } else {
+    // Button → reset on failure
+    btn.textContent = '💾 Save Property';
+    btn.classList.remove('btn-saving');
+    btn.disabled = false;
     toast('Save failed. Check your connection.', 'error');
   }
+}
+
+function watchForChanges() {
+  const btn = document.getElementById('saveBtn');
+  const fields = document.querySelectorAll('.form-page input, .form-page select, .form-page textarea');
+  const reset = () => {
+    btn.textContent = '💾 Save Property';
+    btn.classList.remove('btn-saved');
+    fields.forEach(f => f.removeEventListener('input', reset));
+    fields.forEach(f => f.removeEventListener('change', reset));
+  };
+  fields.forEach(f => f.addEventListener('input', reset));
+  fields.forEach(f => f.addEventListener('change', reset));
 }
 
 // ═══════════════════════════════════════════════
