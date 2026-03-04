@@ -396,6 +396,43 @@ function render(prop) {
   initCarouselTouch();
 }
 
+// ═══ CAROUSEL ═══
+let carouselIndex = 0;
+let touchStartX = 0;
+
+function carouselSync() {
+  const slides = document.querySelectorAll('.carousel-slide');
+  if (!slides.length) return;
+  document.getElementById('carouselTrack').style.transform = `translateX(-${carouselIndex * 100}%)`;
+  document.querySelectorAll('.carousel-dot').forEach((d,i) => d.classList.toggle('active', i === carouselIndex));
+  document.getElementById('carouselCounter').textContent = `${carouselIndex + 1} / ${slides.length}`;
+}
+
+function carouselMove(dir) {
+  const total = document.querySelectorAll('.carousel-slide').length;
+  carouselIndex = (carouselIndex + dir + total) % total;
+  carouselSync();
+}
+
+function carouselGo(i) {
+  carouselIndex = i;
+  carouselSync();
+}
+
+function initCarouselTouch() {
+  const c = document.getElementById('carousel');
+  if (!c) return;
+  c.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive:true });
+  c.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 40) carouselMove(diff > 0 ? 1 : -1);
+  }, { passive:true });
+}
+
+// ═══ NAV ═══
+function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('open');document.getElementById('hamburger').classList.toggle('open');}
+function closeMenu(){document.getElementById('mobileMenu').classList.remove('open');document.getElementById('hamburger').classList.remove('open');}
+
 // ═══ LOAD FROM SUPABASE ═══
 async function loadProperty() {
   const app = document.getElementById('app');
