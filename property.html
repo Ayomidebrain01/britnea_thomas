@@ -270,6 +270,20 @@
 // ═══════════════════════════════════════════
 const SUPABASE_URL = 'https://ekyoqbzgaxhqtrhshlxd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVreW9xYnpnYXhocXRyaHNobHhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDAxNzQsImV4cCI6MjA4ODIxNjE3NH0.8vyzhjFGTGnbe5k7uZMxsQD6DoX4f4HZtcHkjaXxHWU';
+const CACHE_KEY = 'bt_properties_cache';
+const CACHE_TTL = 5 * 60 * 1000;
+
+function getCached() {
+  try {
+    const c = JSON.parse(localStorage.getItem(CACHE_KEY));
+    if (c && Date.now() - c.ts < CACHE_TTL) return c.data;
+  } catch(e) {}
+  return null;
+}
+
+function setCached(data) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
+}
 
 let ALL_PROPERTIES = [];
 let CURRENT_IMAGES = [];
@@ -585,7 +599,21 @@ async function loadProperty() {
   try {
     const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` };
 
-    // Fetch both at the same time — no waiting
+    // Check cache first — show instantly if available
+    const cached = getCached();
+    if (cached) {
+      ALL_PROPERTIES = cached.map(normalise);
+      const cachedProp = ALL_PROPERTIES.find(p => String(p.id) === String(id)) || null;
+      if (cachedProp) {
+        try { render(cachedProp); } catch(e) { console.error('render failed:', e); }
+        // Refresh cache in background
+        fetch(`${SUPABASE_URL}/rest/v1/properties?order=id.asc`, { headers })
+          .then(r => r.json()).then(fresh => { setCached(fresh); }).catch(() => {});
+        return;
+      }
+    }
+
+    // No cache — fetch both simultaneously
     const [propRes, allRes] = await Promise.all([
       fetch(`${SUPABASE_URL}/rest/v1/properties?id=eq.${id}&limit=1`, { headers }),
       fetch(`${SUPABASE_URL}/rest/v1/properties?order=id.asc`, { headers })
@@ -596,10 +624,9 @@ async function loadProperty() {
 
     const [propArr, allArr] = await Promise.all([propRes.json(), allRes.json()]);
 
+    setCached(allArr);
     ALL_PROPERTIES = allArr.map(normalise);
     const prop = propArr[0] ? normalise(propArr[0]) : null;
-
-    console.log('Loaded prop:', prop ? prop.address : 'NOT FOUND');
 
     if (!prop) {
       app.innerHTML = `
