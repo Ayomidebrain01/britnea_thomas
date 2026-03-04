@@ -223,248 +223,32 @@
 // ═══════════════════════════════════════════
 //  PROPERTY DATA STORE — all 8 listings
 // ═══════════════════════════════════════════
-const PROPERTIES = [
-  {
-    id: 1,
-    tag: "New Construction",
-    badge: "$5,000 Deposit",
-    price: "$389,000",
-    address: "Exclusive Gated Community · 30 min from Dallas, TX",
-    area: "DFW — Rockwall County",
-    beds: 4, baths: 3, sqft: "2,480", garage: 2,
-    deposit: "$5,000",
-    status: "Move-In Ready",
-    market: "DFW",
-    tags: ["dfw","new-construction"],
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=85",
-    images: [
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=85",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
-      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80"
-    ],
-    description: "Welcome to this stunning new construction home nestled inside an exclusive gated community just 30 minutes from Dallas. Featuring soaring ceilings, an open-concept kitchen with quartz countertops, and a spacious primary suite with a spa-inspired bathroom — this home checks every box. Low $5,000 deposit to secure your lot.",
-    features: [
-      "Quartz countertops throughout","Open-concept floor plan","Primary suite with spa bath",
-      "Covered back patio","2-car garage","Smart home package",
-      "Energy-efficient windows","Gated community entrance","Community pool & amenities","Builder warranty included"
-    ],
-    mapQuery: "Rockwall+County+Texas",
-    video: null   // e.g. "https://www.youtube.com/embed/VIDEO_ID" or "https://player.vimeo.com/video/VIDEO_ID"
-  },
-  {
-    id: 2,
-    tag: "Build on 1 Acre",
-    badge: "$2,500 Down",
-    price: "$310,000",
-    address: "25 min from Dallas, TX",
-    area: "DFW — Kaufman County",
-    beds: 3, baths: 2, sqft: "1,950", garage: 2,
-    deposit: "$2,500",
-    status: "To Be Built",
-    market: "DFW",
-    tags: ["dfw","new-construction","low-deposit"],
-    image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&q=85",
-    images: [
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&q=85",
-      "https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=800&q=80",
-      "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=800&q=80",
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"
-    ],
-    description: "Build your custom dream home on a full acre of land just 25 minutes from Dallas — starting at only $2,500 down. Choose your floor plan, finishes, and lot from available inventory. This is your opportunity to get into new construction at one of the lowest entry points in the DFW market.",
-    features: [
-      "Full 1-acre lot","Custom floor plan options","Choose your own finishes",
-      "3 bed / 2 bath base plan","2-car garage included","Septic & well on site",
-      "No HOA","Builder upgrades available","Country living, city close","Low $2,500 deposit"
-    ],
-    mapQuery: "Kaufman+County+Texas",
-    video: null   // e.g. "https://www.youtube.com/embed/VIDEO_ID" or "https://player.vimeo.com/video/VIDEO_ID"
-  },
-  {
-    id: 3,
-    tag: "Houston Area",
-    badge: "$10,000 Deposit",
-    price: "$445,000",
-    address: "Sugar Land · Houston, TX",
-    area: "Greater Houston — Fort Bend County",
-    beds: 5, baths: 4, sqft: "3,100", garage: 2,
-    deposit: "$10,000",
-    status: "New Construction",
-    market: "Houston",
-    tags: ["houston","new-construction"],
-    image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1200&q=85",
-    images: [
-      "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1200&q=85",
-      "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
-      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80"
-    ],
-    description: "A spacious 5-bedroom, 4-bathroom new construction home in one of Greater Houston's most desirable master-planned communities — Sugar Land. Top-rated Fort Bend ISD schools, resort-style community amenities, and a chef's kitchen make this the ultimate family home. Ready for you to personalize your selections.",
-    features: [
-      "5 bedrooms + game room","4 full bathrooms","Chef's kitchen with island",
-      "Fort Bend ISD schools","Master-planned community","Resort pool & trails",
-      "Covered outdoor living","Primary suite downstairs","3-car garage option","Energy Star certified"
-    ],
-    mapQuery: "Sugar+Land+Texas",
-    video: null   // e.g. "https://www.youtube.com/embed/VIDEO_ID" or "https://player.vimeo.com/video/VIDEO_ID"
-  },
-  {
-    id: 4,
-    tag: "DFW",
-    badge: "$5,000 Deposit",
-    price: "$355,000",
-    address: "30 min from Dallas, TX",
-    area: "DFW — Forney / Kaufman County",
-    beds: 4, baths: 3, sqft: "2,200", garage: 2,
-    deposit: "$5,000",
-    status: "Move-In Ready",
-    market: "DFW",
-    tags: ["dfw","new-construction","low-deposit"],
-    image: "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=85",
-    images: [
-      "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=85",
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80",
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"
-    ],
-    description: "This move-in ready 4-bedroom home is one of the best value opportunities in the DFW market — just 30 minutes from Dallas with only $5,000 down to get started. Featuring an open layout, granite countertops, a large backyard, and a community park just steps away. Perfect for first-time buyers ready to stop renting.",
-    features: [
-      "Move-in ready — no wait","Open kitchen & living","Granite countertops",
-      "Large backyard","Community park nearby","Energy-efficient construction",
-      "4 bedrooms + flex space","2-car attached garage","First-time buyer friendly","Low $5,000 deposit"
-    ],
-    mapQuery: "Forney+Texas",
-    video: null   // e.g. "https://www.youtube.com/embed/VIDEO_ID" or "https://player.vimeo.com/video/VIDEO_ID"
-  },
-  {
-    id: 5,
-    tag: "Houston Area",
-    badge: "$2,500 Down",
-    price: "$298,000",
-    address: "Pearland · Houston, TX",
-    area: "Greater Houston — Brazoria County",
-    beds: 3, baths: 2, sqft: "1,850", garage: 2,
-    deposit: "$2,500",
-    status: "Move-In Ready",
-    market: "Houston",
-    tags: ["houston","low-deposit"],
-    image: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=1200&q=85",
-    images: [
-      "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=1200&q=85",
-      "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80",
-      "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80"
-    ],
-    description: "This beautifully finished 3-bedroom home in Pearland offers one of the lowest entry points in the Greater Houston market — just $2,500 down. Located in Pearland ISD with quick access to the Texas Medical Center and downtown Houston, this is the perfect starter home for first-time buyers or investors.",
-    features: [
-      "Only $2,500 to get started","Pearland ISD schools","Quick access to Med Center",
-      "Open living & dining","Updated kitchen finishes","Primary suite with walk-in closet",
-      "Covered patio","2-car garage","Low HOA community","Move-in ready now"
-    ],
-    mapQuery: "Pearland+Texas",
-    video: null   // e.g. "https://www.youtube.com/embed/VIDEO_ID" or "https://player.vimeo.com/video/VIDEO_ID"
-  },
-  {
-    id: 6,
-    tag: "Gated Community",
-    badge: "$7,500 Deposit",
-    price: "$419,000",
-    address: "Prosper · DFW, TX",
-    area: "DFW — Collin County",
-    beds: 4, baths: 3.5, sqft: "2,760", garage: 3,
-    deposit: "$7,500",
-    status: "New Construction",
-    market: "DFW",
-    tags: ["dfw","new-construction"],
-    image: "https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=1200&q=85",
-    images: [
-      "https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=1200&q=85",
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
-      "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=800&q=80",
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80"
-    ],
-    description: "Luxury new construction in Prosper — one of the most sought-after zip codes in the entire DFW metroplex. This elegant 4-bed, 3.5-bath home inside a private gated community features a 3-car garage, soaring entryway, and upscale finishes throughout. Prosper ISD — consistently ranked among the best in Texas.",
-    features: [
-      "Private gated community","Prosper ISD — top rated","3-car garage",
-      "Soaring 2-story entryway","Butler's pantry & wine bar","Primary bath with freestanding tub",
-      "Upstairs game room","Covered outdoor kitchen area","Community trails & lakes","Builder design selections available"
-    ],
-    mapQuery: "Prosper+Texas",
-    video: null   // e.g. "https://www.youtube.com/embed/VIDEO_ID" or "https://player.vimeo.com/video/VIDEO_ID"
-  },
-  {
-    id: 7,
-    tag: "Move-In Ready",
-    badge: "$2,500 Down",
-    price: "$329,000",
-    address: "Forney · DFW, TX",
-    area: "DFW — Kaufman County",
-    beds: 4, baths: 2, sqft: "2,050", garage: 2,
-    deposit: "$2,500",
-    status: "Move-In Ready",
-    market: "DFW",
-    tags: ["dfw","low-deposit"],
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=85",
-    images: [
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=85",
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80",
-      "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=800&q=80",
-      "https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=800&q=80"
-    ],
-    description: "Stop renting and start building equity — this move-in ready 4-bedroom home in Forney is available with just $2,500 down. Forney has become one of the fastest-growing cities in DFW, offering affordable homeownership with quick access to I-20 and downtown Dallas. Perfect for first-time buyers ready to move now.",
-    features: [
-      "Move-in ready today","Only $2,500 down","Forney ISD schools",
-      "Quick I-20 access","4 bedrooms, open layout","Kitchen with breakfast bar",
-      "Large backyard with patio","2-car garage","New appliances included","First-time buyer programs available"
-    ],
-    mapQuery: "Forney+Texas",
-    video: null   // e.g. "https://www.youtube.com/embed/VIDEO_ID" or "https://player.vimeo.com/video/VIDEO_ID"
-  },
-  {
-    id: 8,
-    tag: "New Construction",
-    badge: "$10,000 Deposit",
-    price: "$478,000",
-    address: "Katy · Houston, TX",
-    area: "Greater Houston — Harris County",
-    beds: 5, baths: 4, sqft: "3,350", garage: 2,
-    deposit: "$10,000",
-    status: "Under Construction",
-    market: "Houston",
-    tags: ["houston","new-construction"],
-    image: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=1200&q=85",
-    images: [
-      "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80",
-      "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80",
-      "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80"
-    ],
-    description: "One of the most spacious new construction homes available in Greater Houston — this 5-bed, 4-bath stunner in Katy features 3,350 sq ft of beautifully designed living space inside one of Houston's most established master-planned communities. Katy ISD — nationally recognized. Expected completion in 90 days.",
-    features: [
-      "5 bed + media room + study","4 full bathrooms","Katy ISD — nationally ranked",
-      "Master-planned community","Resort-style amenities","Chef's kitchen with double islands",
-      "Upstairs game room","Primary suite with sitting area","3-car garage option","Completion est. in 90 days"
-    ],
-    mapQuery: "Katy+Texas",
-    video: null   // e.g. "https://www.youtube.com/embed/VIDEO_ID" or "https://player.vimeo.com/video/VIDEO_ID"
-  }
-];
+const SUPABASE_URL = 'https://ekyoqbzgaxhqtrhshlxd.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVreW9xYnpnYXhocXRyaHNobHhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDAxNzQsImV4cCI6MjA4ODIxNjE3NH0.8vyzhjFGTGnbe5k7uZMxsQD6DoX4f4HZtcHkjaXxHWU';
 
-// ═══════════════════════════════════════════
-//  RENDER
-// ═══════════════════════════════════════════
+let ALL_PROPERTIES = [];
+
+// ═══ RENDER ═══
 function getSimilar(prop) {
-  return PROPERTIES
-    .filter(p => p.id !== prop.id && (p.market === prop.market || p.tags.some(t => prop.tags.includes(t))))
+  const tags = Array.isArray(prop.tags) ? prop.tags : [];
+  return ALL_PROPERTIES
+    .filter(p => p.id !== prop.id && (p.market === prop.market || (Array.isArray(p.tags) && p.tags.some(t => tags.includes(t)))))
     .slice(0, 3);
 }
 
-function render() {
-  const params = new URLSearchParams(window.location.search);
-  const id = parseInt(params.get('id'));
-  const prop = PROPERTIES.find(p => p.id === id);
-  const app = document.getElementById('app');
+function normalise(p) {
+  // Supabase returns snake_case — map map_query → mapQuery
+  return {
+    ...p,
+    mapQuery: p.map_query || p.mapQuery || '',
+    images: Array.isArray(p.images) ? p.images : [],
+    features: Array.isArray(p.features) ? p.features : [],
+    tags: Array.isArray(p.tags) ? p.tags : [],
+  };
+}
 
+function render(prop) {
+  const app = document.getElementById('app');
   if (!prop) {
     app.innerHTML = `
       <div class="not-found">
@@ -479,19 +263,10 @@ function render() {
   const similar = getSimilar(prop);
 
   app.innerHTML = `
-    <!-- BREADCRUMB -->
-    <div class="breadcrumb">
-      <a href="listings.html">Listings</a>
-      <span>/</span>
-      <span class="current">${prop.tag} · ${prop.market}</span>
-    </div>
-
     <!-- MOBILE CAROUSEL -->
     <div class="carousel" id="carousel">
       <div class="carousel-track" id="carouselTrack">
-        ${prop.images.map(src => `
-          <div class="carousel-slide"><img src="${src}" alt="${prop.address}"></div>
-        `).join('')}
+        ${prop.images.map(src => `<div class="carousel-slide"><img src="${src}" alt="${prop.address}"></div>`).join('')}
       </div>
       <button class="carousel-btn carousel-prev" onclick="carouselMove(-1)">&#8592;</button>
       <button class="carousel-btn carousel-next" onclick="carouselMove(1)">&#8594;</button>
@@ -505,29 +280,20 @@ function render() {
     <div class="gallery">
       <div class="gallery-main">
         ${prop.video
-          ? `<div class="gallery-video-wrap">
-               <iframe src="${prop.video}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:100%;"></iframe>
-             </div>`
-          : `<img src="${prop.images[0]}" alt="${prop.address}">`
-        }
+          ? `<div class="gallery-video-wrap"><iframe src="${prop.video}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:100%;"></iframe></div>`
+          : `<img src="${prop.images[0] || ''}" alt="${prop.address}">`}
       </div>
       ${prop.images[1] ? `<div class="gallery-thumb"><img src="${prop.images[1]}" alt="View 2"></div>` : ''}
       ${prop.images[2] ? `<div class="gallery-thumb"><img src="${prop.images[2]}" alt="View 3"></div>` : ''}
       ${prop.images[3] && !prop.images[4]
         ? `<div class="gallery-thumb"><img src="${prop.images[3]}" alt="View 4"></div>`
         : prop.images[3]
-          ? `<div class="gallery-thumb" style="position:relative;">
-               <img src="${prop.images[3]}" alt="More" style="filter:brightness(0.45)">
-               <div class="gallery-more"><span>+ ${prop.images.length - 3} More</span></div>
-             </div>`
-          : ''
-      }
+          ? `<div class="gallery-thumb" style="position:relative;"><img src="${prop.images[3]}" alt="More" style="filter:brightness(0.45)"><div class="gallery-more"><span>+ ${prop.images.length - 3} More</span></div></div>`
+          : ''}
     </div>
 
     <!-- DETAIL LAYOUT -->
     <div class="detail-layout">
-
-      <!-- LEFT -->
       <div class="detail-left">
         <div class="prop-tag">${prop.tag}</div>
         <div class="prop-price">${prop.price}</div>
@@ -561,13 +327,8 @@ function render() {
 
         <div class="section-label">Location</div>
         <div class="map-wrap">
-          <iframe
-            class="map-embed"
-            loading="lazy"
-            allowfullscreen
-            referrerpolicy="no-referrer-when-downgrade"
-            src="https://maps.google.com/maps?q=${prop.mapQuery}&output=embed&z=13">
-          </iframe>
+          <iframe class="map-embed" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
+            src="https://maps.google.com/maps?q=${prop.mapQuery}&output=embed&z=13"></iframe>
           <div class="map-footer">
             <div class="map-area-label">
               <span class="map-pin-icon">📍</span>
@@ -583,18 +344,17 @@ function render() {
           <div class="similar-grid">
             ${similar.map(s => `
               <a href="property.html?id=${s.id}" class="sim-card">
-                <div class="sim-img"><img src="${s.image}" alt="${s.address}"></div>
+                <div class="sim-img"><img src="${(Array.isArray(s.images)?s.images:[])[0] || s.image || ''}" alt="${s.address}"></div>
                 <div class="sim-body">
                   <div class="sim-price">${s.price}</div>
                   <div class="sim-addr">${s.address}</div>
                 </div>
-              </a>
-            `).join('')}
+              </a>`).join('')}
           </div>
         </div>` : ''}
       </div>
 
-      <!-- RIGHT SIDEBAR -->
+      <!-- SIDEBAR -->
       <div class="detail-right">
         <div class="sidebar-card">
           <div class="sidebar-header">
@@ -632,66 +392,40 @@ function render() {
       </div>
     </div>
   `;
+
+  initCarouselTouch();
 }
 
-// ═══ CAROUSEL ═══
-let carouselIndex = 0;
-let touchStartX = 0;
+// ═══ LOAD FROM SUPABASE ═══
+async function loadProperty() {
+  const app = document.getElementById('app');
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
 
-function carouselSync() {
-  const slides = document.querySelectorAll('.carousel-slide');
-  if (!slides.length) return;
-  document.getElementById('carouselTrack').style.transform = `translateX(-${carouselIndex * 100}%)`;
-  document.querySelectorAll('.carousel-dot').forEach((d,i) => d.classList.toggle('active', i === carouselIndex));
-  document.getElementById('carouselCounter').textContent = `${carouselIndex + 1} / ${slides.length}`;
-}
+  if (!id) {
+    app.innerHTML = `<div class="not-found"><h2>No property specified.</h2><a href="listings.html" class="btn-primary" style="display:inline-block;padding:14px 32px;">← Back to Listings</a></div>`;
+    return;
+  }
 
-function carouselMove(dir) {
-  const total = document.querySelectorAll('.carousel-slide').length;
-  carouselIndex = (carouselIndex + dir + total) % total;
-  carouselSync();
-}
+  app.innerHTML = `<div style="text-align:center;padding:120px 40px;color:var(--soft);font-size:0.85rem;letter-spacing:0.12em;text-transform:uppercase;">Loading property…</div>`;
 
-function carouselGo(i) {
-  carouselIndex = i;
-  carouselSync();
-}
-
-// Touch swipe — runs after render() injects carousel into DOM
-function initCarouselTouch() {
-  const c = document.getElementById('carousel');
-  if (!c) return;
-  c.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive:true });
-  c.addEventListener('touchend', e => {
-    const diff = touchStartX - e.changedTouches[0].screenX;
-    if (Math.abs(diff) > 40) carouselMove(diff > 0 ? 1 : -1);
-  }, { passive:true });
-}
-
-// ═══ NAV ═══
-function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('open');document.getElementById('hamburger').classList.toggle('open');}
-function closeMenu(){document.getElementById('mobileMenu').classList.remove('open');document.getElementById('hamburger').classList.remove('open');}
-
-// Merge admin-added properties from localStorage
-(function mergeAdminProperties() {
   try {
-    const stored = JSON.parse(localStorage.getItem('britnae_properties') || '[]');
-    if (stored.length) {
-      // Admin properties take precedence — merge by id, append new ones
-      stored.forEach(p => {
-        const idx = PROPERTIES.findIndex(hp => hp.id === p.id);
-        if (idx > -1) PROPERTIES[idx] = p;
-        else PROPERTIES.push(p);
-      });
-      // Remove any that were deleted in admin
-      const adminIds = stored.map(p => p.id);
-      // Keep hardcoded + admin; admin deletions only affect admin-created ones
-    }
-  } catch(e) {}
-})();
+    // Fetch the property + all properties (for similar)
+    const [propRes, allRes] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/properties?id=eq.${id}`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }),
+      fetch(`${SUPABASE_URL}/rest/v1/properties?order=id.asc`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } })
+    ]);
 
-render();
-initCarouselTouch();
+    const [propArr, allArr] = await Promise.all([propRes.json(), allRes.json()]);
+    ALL_PROPERTIES = allArr.map(normalise);
+    const prop = propArr[0] ? normalise(propArr[0]) : null;
+    render(prop);
+  } catch(e) {
+    app.innerHTML = `<div class="not-found"><h2>Failed to load property.</h2><p>Please check your connection and try again.</p><a href="listings.html" class="btn-primary" style="display:inline-block;padding:14px 32px;">← Back to Listings</a></div>`;
+  }
+}
+
+loadProperty();
 </script>
 </body>
 </html>
