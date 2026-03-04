@@ -648,8 +648,8 @@ function rowHTML(p, showActions = false) {
     <td>${p.deposit}</td>
     ${showActions ? `<td><div class="td-actions">
       <button class="btn btn-outline btn-sm" onclick="editProperty(${p.id})">Edit</button>
-      <button class="btn btn-outline btn-sm" onclick="duplicateProperty(${p.id})" style="color:var(--gold);border-color:rgba(201,168,76,0.3)">Copy</button>
-      <button class="btn btn-danger btn-sm" onclick="promptDelete(${p.id})">Delete</button>
+      <button class="btn btn-outline btn-sm" id="copy-${p.id}" onclick="duplicateProperty(${p.id}, this)" style="color:var(--gold);border-color:rgba(201,168,76,0.3)">Copy</button>
+      <button class="btn btn-danger btn-sm" id="del-${p.id}" onclick="promptDelete(${p.id}, this)">Delete</button>
     </div></td>` : '<td></td>'}
   </tr>`;
 }
@@ -874,12 +874,16 @@ async function editProperty(id) {
   document.getElementById('topbarTitle').textContent = 'Edit Property';
 }
 
-async function duplicateProperty(id) {
+async function duplicateProperty(id, btn) {
+  // Button → copying state
+  const original_text = btn.textContent;
+  btn.textContent = '⏳ Copying…';
+  btn.disabled = true;
+
   const props = await db.getAll();
   const original = props.find(p => p.id === id);
-  if (!original) return;
+  if (!original) { btn.textContent = original_text; btn.disabled = false; return; }
 
-  // Clone with new id and a "Copy of" label
   const copy = {
     ...original,
     id: Date.now(),
@@ -889,10 +893,14 @@ async function duplicateProperty(id) {
 
   const ok = await db.insert(copy);
   if (ok) {
-    toast('Property duplicated! Edit it in the list.', 'success');
+    btn.textContent = '✅ Done!';
+    setTimeout(() => { btn.textContent = original_text; btn.disabled = false; }, 2000);
+    toast('Property duplicated — find it at the bottom of the list.', 'success');
     renderTable();
     renderDashboard();
   } else {
+    btn.textContent = '✕ Failed';
+    setTimeout(() => { btn.textContent = original_text; btn.disabled = false; }, 2000);
     toast('Duplicate failed. Try again.', 'error');
   }
 }
@@ -901,18 +909,32 @@ async function duplicateProperty(id) {
 //  DELETE
 // ═══════════════════════════════════════════════
 let pendingDeleteId = null;
+let pendingDeleteBtn = null;
 
-function promptDelete(id) {
+function promptDelete(id, btn) {
   pendingDeleteId = id;
+  pendingDeleteBtn = btn;
   document.getElementById('deleteModal').classList.add('open');
 }
 
 async function confirmDelete() {
+  // Button → deleting state
+  const deleteBtn = document.querySelector('#deleteModal .btn-danger');
+  deleteBtn.textContent = '⏳ Deleting…';
+  deleteBtn.disabled = true;
+
   const ok = await db.remove(pendingDeleteId);
   closeModal();
-  if (ok) { toast('Property deleted.', 'error'); } else { toast('Delete failed.', 'error'); }
-  renderTable();
-  renderDashboard();
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.disabled = false;
+
+  if (ok) {
+    toast('Property deleted.', 'error');
+    renderTable();
+    renderDashboard();
+  } else {
+    toast('Delete failed. Try again.', 'error');
+  }
 }
 
 function closeModal() {
