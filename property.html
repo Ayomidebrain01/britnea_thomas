@@ -268,16 +268,10 @@
 // ═══════════════════════════════════════════
 //  PROPERTY DATA STORE — all 8 listings
 // ═══════════════════════════════════════════
-const SUPABASE_URL = 'https://ekyoqbzgaxhqtrhshlxd.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVreW9xYnpnYXhocXRyaHNobHhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDAxNzQsImV4cCI6MjA4ODIxNjE3NH0.8vyzhjFGTGnbe5k7uZMxsQD6DoX4f4HZtcHkjaXxHWU';
+const GITHUB_USER = ''; // your GitHub username
+const GITHUB_REPO = ''; // e.g. britnae-thomas
+const CDN_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@main/properties.json`;
 const CACHE_KEY = 'bt_properties_cache';
-
-function getCached() {
-  try { const c = JSON.parse(localStorage.getItem(CACHE_KEY)); return c && c.data ? c.data : null; } catch(e) { return null; }
-}
-function setCached(data) {
-  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
-}
 
 let ALL_PROPERTIES = [];
 let CURRENT_IMAGES = [];
@@ -561,7 +555,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeLightbox();
 });
 
-// ═══ LOAD FROM SUPABASE ═══
+// ═══ LOAD FROM CDN ═══
 async function loadProperty() {
   const app = document.getElementById('app');
   const params = new URLSearchParams(window.location.search);
@@ -572,6 +566,7 @@ async function loadProperty() {
     return;
   }
 
+  // Show skeleton immediately
   app.innerHTML = `
     <div style="padding:100px 60px 80px;max-width:1100px;margin:0 auto;animation:pulse 1.5s ease-in-out infinite;">
       <div style="height:14px;width:180px;background:#e0d8cc;margin-bottom:32px;"></div>
@@ -590,33 +585,28 @@ async function loadProperty() {
     <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}</style>
   `;
 
-  try {
-    const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` };
-
-    // Show cached instantly if available
-    const cached = getCached();
-    if (cached) {
-      ALL_PROPERTIES = cached.map(normalise);
-      const cachedProp = ALL_PROPERTIES.find(p => String(p.id) === String(id));
-      if (cachedProp) {
-        try { render(cachedProp); } catch(e) { console.error('render failed:', e); }
-      }
+  // Show cached instantly if available
+  const cached = getCached();
+  if (cached) {
+    ALL_PROPERTIES = cached.map(normalise);
+    const cachedProp = ALL_PROPERTIES.find(p => String(p.id) === String(id));
+    if (cachedProp) {
+      try { render(cachedProp); } catch(e) { console.error('render failed:', e); }
     }
+  }
 
-    // Always fetch fresh from Supabase — it is the only source of truth
-    const [propRes, allRes] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/properties?id=eq.${id}&limit=1`, { headers }),
-      fetch(`${SUPABASE_URL}/rest/v1/properties?order=id.asc`, { headers })
-    ]);
-    if (!propRes.ok || !allRes.ok) return;
-    const [propArr, allArr] = await Promise.all([propRes.json(), allRes.json()]);
+  try {
+    // Fetch from jsDelivr CDN — served from global edge, no cold start
+    const res = await fetch(CDN_URL + '?t=' + Date.now());
+    if (!res.ok) throw new Error('Failed to load');
+    const allArr = await res.json();
 
     setCached(allArr);
     ALL_PROPERTIES = allArr.map(normalise);
-    const freshProp = propArr[0] ? normalise(propArr[0]) : null;
+    const prop = ALL_PROPERTIES.find(p => String(p.id) === String(id)) || null;
 
-    if (freshProp) {
-      try { render(freshProp); } catch(e) { console.error('re-render failed:', e); }
+    if (prop) {
+      try { render(prop); } catch(e) { console.error('render failed:', e); }
     } else {
       app.innerHTML = `
         <div class="not-found">
@@ -627,13 +617,14 @@ async function loadProperty() {
     }
 
   } catch(e) {
-    console.error('loadProperty failed:', e);
-    app.innerHTML = `
-      <div class="not-found">
-        <h2>Failed to load property.</h2>
-        <p>${e.message || 'Please check your connection and try again.'}</p>
-        <a href="listings.html" class="btn-primary" style="display:inline-block;padding:14px 32px;">← Back to Listings</a>
-      </div>`;
+    if (!cached) {
+      app.innerHTML = `
+        <div class="not-found">
+          <h2>Failed to load property.</h2>
+          <p>Please check your connection and try again.</p>
+          <a href="listings.html" class="btn-primary" style="display:inline-block;padding:14px 32px;">← Back to Listings</a>
+        </div>`;
+    }
   }
 }
 

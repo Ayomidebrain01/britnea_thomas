@@ -581,16 +581,9 @@
     document.getElementById('hamburger').classList.remove('open');
   }
 
-  const SUPABASE_URL = 'https://ekyoqbzgaxhqtrhshlxd.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVreW9xYnpnYXhocXRyaHNobHhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDAxNzQsImV4cCI6MjA4ODIxNjE3NH0.8vyzhjFGTGnbe5k7uZMxsQD6DoX4f4HZtcHkjaXxHWU';
-  const CACHE_KEY = 'bt_properties_cache';
-
-  function getCache() {
-    try { const c = JSON.parse(localStorage.getItem(CACHE_KEY)); return c && c.data ? c.data : null; } catch(e) { return null; }
-  }
-  function setCache(data) {
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
-  }
+  const GITHUB_USER = ''; // your GitHub username
+  const GITHUB_REPO = ''; // e.g. britnae-thomas
+  const CDN_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@main/properties.json`;
 
   function showcaseCardHTML(p, featured) {
     const imgs = Array.isArray(p.images) ? p.images : [];
@@ -623,17 +616,12 @@
   }
 
   async function loadShowcase() {
-    const cached = getCache();
-    if (cached) renderShowcase(cached);
-
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/properties?order=id.asc&select=id,tag,price,deposit,address,market,status,beds,baths,sqft,images`,
-        { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+        CDN_URL + '?t=' + Date.now()
       );
       if (!res.ok) return;
       const fresh = await res.json();
-      setCache(fresh);
       renderShowcase(fresh);
     } catch(e) {}
   }
