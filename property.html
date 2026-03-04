@@ -272,25 +272,9 @@ const SUPABASE_URL = 'https://ekyoqbzgaxhqtrhshlxd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVreW9xYnpnYXhocXRyaHNobHhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDAxNzQsImV4cCI6MjA4ODIxNjE3NH0.8vyzhjFGTGnbe5k7uZMxsQD6DoX4f4HZtcHkjaXxHWU';
 const CACHE_KEY = 'bt_properties_cache';
 
-const SEED_DATA = [
-  {id:1,tag:"New Construction",price:"From $299,990",deposit:"$1,000",address:"Forney · Kaufman County, TX",area:"DFW — Kaufman County",market:"DFW",status:"New Construction",beds:4,baths:3,sqft:"2,100+",garage:2,map_query:"Forney+Texas",description:"Brand new construction in one of DFW's fastest-growing communities. Low deposit, builder financing available, and first-time buyer programs accepted.",features:["Open Floor Plan","Granite Countertops","Stainless Appliances","2-Car Garage","Master Suite","Walk-in Closets","Covered Patio","Energy Efficient","Smart Home Ready","Builder Warranty"],tags:["dfw","new-construction","low-deposit"],images:["https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1200&q=80","https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80","https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80","https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&q=80"]},
-  {id:2,tag:"Move-In Ready",price:"From $349,990",deposit:"$3,500",address:"Royse City · Rockwall County, TX",area:"DFW — Rockwall County",market:"DFW",status:"Move-In Ready",beds:4,baths:3.5,sqft:"2,650",garage:2,map_query:"Royse+City+Texas",description:"Move-in ready home in the highly sought-after Rockwall County. Upgraded finishes, spacious layout, and great schools nearby.",features:["Chef's Kitchen","Quartz Countertops","Hardwood Floors","3.5 Bathrooms","Game Room","Study/Office","3-Car Garage","Covered Patio","Sprinkler System","Builder Warranty"],tags:["dfw","new-construction"],images:["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80","https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80","https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80","https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80"]},
-  {id:3,tag:"To Be Built",price:"From $275,000",deposit:"$1,000",address:"Josephine · Collin County, TX",area:"DFW — Collin County",market:"DFW",status:"To Be Built",beds:3,baths:2,sqft:"1,800",garage:2,map_query:"Josephine+Texas",description:"Affordable new construction opportunity in fast-growing Collin County. Choose your finishes and personalize your dream home from the ground up.",features:["Pick Your Finishes","Open Living Area","Modern Kitchen","2-Car Garage","Master Suite","Walk-in Pantry","Energy Efficient","Low HOA","Builder Incentives","First-Time Buyer Friendly"],tags:["dfw","new-construction","low-deposit"],images:["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80","https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80","https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80","https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80"]},
-  {id:4,tag:"Gated Community",price:"From $425,000",deposit:"$5,000",address:"Prosper · Collin County, TX",area:"DFW — Collin County",market:"DFW",status:"New Construction",beds:5,baths:4,sqft:"3,200",garage:3,map_query:"Prosper+Texas",description:"Luxury living in the prestigious gated community of Prosper. Top-rated schools, resort-style amenities, and designer finishes throughout.",features:["Gated Entry","Resort Pool","5 Bedrooms","4 Full Baths","Media Room","3-Car Garage","Designer Kitchen","Vaulted Ceilings","Outdoor Kitchen","Top-Rated Schools"],tags:["dfw","new-construction"],images:["https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=80","https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80","https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80","https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80"]},
-  {id:5,tag:"New Construction",price:"From $289,990",deposit:"$1,000",address:"Rosharon · Brazoria County, TX",area:"Houston — Brazoria County",market:"Houston",status:"New Construction",beds:4,baths:3,sqft:"2,200",garage:2,map_query:"Rosharon+Texas",description:"Affordable new construction south of Houston in beautiful Brazoria County. Minutes from Highway 288, easy commute to the Medical Center and Downtown.",features:["Open Floor Plan","Granite Countertops","Covered Patio","2-Car Garage","Master Retreat","Energy Efficient","Smart Home","Builder Warranty","Low HOA","First-Time Buyer Programs"],tags:["houston","new-construction","low-deposit"],images:["https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&q=80","https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80","https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80","https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80"]},
-  {id:6,tag:"Move-In Ready",price:"From $319,990",deposit:"$2,500",address:"Conroe · Montgomery County, TX",area:"Houston — Montgomery County",market:"Houston",status:"Move-In Ready",beds:4,baths:3,sqft:"2,400",garage:2,map_query:"Conroe+Texas",description:"Beautiful move-in ready home in Conroe's master-planned community. Lake Conroe access, great schools, and a vibrant community make this the perfect family home.",features:["Lake Community","Master-Planned","4 Bedrooms","3 Full Baths","Game Room","2-Car Garage","Covered Patio","Community Pool","Walking Trails","Top Schools"],tags:["houston","new-construction"],images:["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80","https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80","https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80","https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80"]},
-  {id:7,tag:"New Construction",price:"From $260,000",deposit:"$1,000",address:"Texas City · Galveston County, TX",area:"Houston — Galveston County",market:"Houston",status:"New Construction",beds:3,baths:2.5,sqft:"1,950",garage:2,map_query:"Texas+City+Texas",description:"Affordable coastal living in Texas City. Close to Galveston Island, NASA, and the booming Clear Lake area. Perfect starter home with low deposit.",features:["Coastal Location","3 Bedrooms","2.5 Baths","Open Kitchen","2-Car Garage","Covered Patio","Energy Efficient","Low Deposit","Builder Incentives","FHA/VA Approved"],tags:["houston","new-construction","low-deposit"],images:["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80","https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80","https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80","https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80"]},
-  {id:8,tag:"Energy Efficient",price:"From $379,990",deposit:"$3,000",address:"Sugar Land · Fort Bend County, TX",area:"Houston — Fort Bend County",market:"Houston",status:"New Construction",beds:4,baths:3.5,sqft:"2,850",garage:2,map_query:"Sugar+Land+Texas",description:"Premier energy-efficient home in the heart of Sugar Land — one of Texas's most desirable suburbs. Award-winning Fort Bend ISD and upscale amenities.",features:["Energy Star Certified","Solar Ready","4 Bedrooms","3.5 Baths","Gourmet Kitchen","Study","2-Car Garage","Fort Bend ISD","Community Pool","Walking Distance to Shops"],tags:["houston","new-construction"],images:["https://images.unsplash.com/photo-1502005097973-6a7082348e28?w=1200&q=80","https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80","https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80","https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80"]}
-];
-
 function getCached() {
-  try {
-    const c = JSON.parse(localStorage.getItem(CACHE_KEY));
-    if (c && c.data) return c.data;
-  } catch(e) {}
-  return null;
+  try { const c = JSON.parse(localStorage.getItem(CACHE_KEY)); return c && c.data ? c.data : null; } catch(e) { return null; }
 }
-
 function setCached(data) {
   try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
 }
@@ -609,16 +593,17 @@ async function loadProperty() {
   try {
     const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` };
 
-    // 1. INSTANT — show cached or seed data immediately
+    // Show cached instantly if available
     const cached = getCached();
-    const instant = cached || SEED_DATA;
-    ALL_PROPERTIES = instant.map(normalise);
-    const instantProp = ALL_PROPERTIES.find(p => String(p.id) === String(id));
-    if (instantProp) {
-      try { render(instantProp); } catch(e) { console.error('render failed:', e); }
+    if (cached) {
+      ALL_PROPERTIES = cached.map(normalise);
+      const cachedProp = ALL_PROPERTIES.find(p => String(p.id) === String(id));
+      if (cachedProp) {
+        try { render(cachedProp); } catch(e) { console.error('render failed:', e); }
+      }
     }
 
-    // 2. ALWAYS fetch from Supabase — it is the truth
+    // Always fetch fresh from Supabase — it is the only source of truth
     const [propRes, allRes] = await Promise.all([
       fetch(`${SUPABASE_URL}/rest/v1/properties?id=eq.${id}&limit=1`, { headers }),
       fetch(`${SUPABASE_URL}/rest/v1/properties?order=id.asc`, { headers })
@@ -631,10 +616,8 @@ async function loadProperty() {
     const freshProp = propArr[0] ? normalise(propArr[0]) : null;
 
     if (freshProp) {
-      // Always re-render with live data
       try { render(freshProp); } catch(e) { console.error('re-render failed:', e); }
     } else {
-      // Property was deleted — show not found
       app.innerHTML = `
         <div class="not-found">
           <h2>Property Not Found</h2>

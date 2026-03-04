@@ -463,72 +463,8 @@
     </div>
     <a href="listings.html" class="view-all">View All Listings →</a>
   </div>
-  <div class="listings-grid">
-    <div class="listing-card featured reveal" onclick="window.location='property.html?id=1'" style="cursor:pointer">
-      <div class="listing-img">
-        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&q=80" alt="Featured Home">
-        <div class="listing-tag">New Construction</div>
-        <div class="listing-deposit">$5,000 Deposit</div>
-      </div>
-      <div class="listing-info">
-        <div class="listing-price">$389,000</div>
-        <div class="listing-addr">Exclusive Gated Community · 30 min from Dallas, TX</div>
-        <div class="listing-specs">
-          <div class="spec"><div class="spec-dot"></div>4 Beds</div>
-          <div class="spec"><div class="spec-dot"></div>3 Baths</div>
-          <div class="spec"><div class="spec-dot"></div>2,480 sqft</div>
-          <div class="spec"><div class="spec-dot"></div>Move-In Ready</div>
-        </div>
-      </div>
-    </div>
-    <div class="listing-card reveal reveal-delay-1" onclick="window.location='property.html?id=2'" style="cursor:pointer">
-      <div class="listing-img">
-        <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=700&q=80" alt="Home 2">
-        <div class="listing-tag">Build on 1 Acre</div>
-        <div class="listing-deposit">$2,500 Down</div>
-      </div>
-      <div class="listing-info">
-        <div class="listing-price">$310,000</div>
-        <div class="listing-addr">25 min from Dallas, TX</div>
-        <div class="listing-specs">
-          <div class="spec"><div class="spec-dot"></div>3 Beds</div>
-          <div class="spec"><div class="spec-dot"></div>2 Baths</div>
-          <div class="spec"><div class="spec-dot"></div>Custom Build</div>
-        </div>
-      </div>
-    </div>
-    <div class="listing-card reveal reveal-delay-1" onclick="window.location='property.html?id=3'" style="cursor:pointer">
-      <div class="listing-img">
-        <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=700&q=80" alt="Home 3">
-        <div class="listing-tag">Houston Area</div>
-        <div class="listing-deposit">$10,000 Deposit</div>
-      </div>
-      <div class="listing-info">
-        <div class="listing-price">$445,000</div>
-        <div class="listing-addr">Sugar Land · Houston, TX</div>
-        <div class="listing-specs">
-          <div class="spec"><div class="spec-dot"></div>5 Beds</div>
-          <div class="spec"><div class="spec-dot"></div>4 Baths</div>
-          <div class="spec"><div class="spec-dot"></div>3,100 sqft</div>
-        </div>
-      </div>
-    </div>
-    <div class="listing-card reveal reveal-delay-2" onclick="window.location='property.html?id=4'" style="cursor:pointer">
-      <div class="listing-img">
-        <img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=700&q=80" alt="Home 4">
-        <div class="listing-tag">DFW</div>
-        <div class="listing-deposit">$5,000 Deposit</div>
-      </div>
-      <div class="listing-info">
-        <div class="listing-price">$355,000</div>
-        <div class="listing-addr">30 min from Dallas, TX</div>
-        <div class="listing-specs">
-          <div class="spec"><div class="spec-dot"></div>4 Beds</div>
-          <div class="spec"><div class="spec-dot"></div>3 Baths</div>
-          <div class="spec"><div class="spec-dot"></div>2,200 sqft</div>
-        </div>
-      </div>
-    </div>
+  <div class="listings-grid" id="showcaseGrid">
+    <!-- loaded dynamically -->
   </div>
 </section>
 
@@ -608,7 +544,7 @@
   <h2 class="cta-title">Your First Home<br><em>Is Closer Than You Think.</em></h2>
   <p class="cta-sub">Book your free Action Plan call today. No commitment, no pressure — just clarity.</p>
   <div class="cta-actions">
-    <a href="contact.html" class="btn-primary">Book Free Consultation</a>
+    <a href="https://calendly.com/britnaedfwrealestate" target="_blank" class="btn-primary">Book Free Consultation</a>
     <a href="https://instagram.com/britnae_therealtor" target="_blank" class="btn-outline">Follow on Instagram</a>
   </div>
 </section>
@@ -644,6 +580,65 @@
     document.getElementById('mobileMenu').classList.remove('open');
     document.getElementById('hamburger').classList.remove('open');
   }
+
+  const SUPABASE_URL = 'https://ekyoqbzgaxhqtrhshlxd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVreW9xYnpnYXhocXRyaHNobHhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDAxNzQsImV4cCI6MjA4ODIxNjE3NH0.8vyzhjFGTGnbe5k7uZMxsQD6DoX4f4HZtcHkjaXxHWU';
+  const CACHE_KEY = 'bt_properties_cache';
+
+  function getCache() {
+    try { const c = JSON.parse(localStorage.getItem(CACHE_KEY)); return c && c.data ? c.data : null; } catch(e) { return null; }
+  }
+  function setCache(data) {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
+  }
+
+  function showcaseCardHTML(p, featured) {
+    const imgs = Array.isArray(p.images) ? p.images : [];
+    return `
+      <div class="listing-card ${featured ? 'featured' : ''} reveal" onclick="window.location='property.html?id=${p.id}'" style="cursor:pointer">
+        <div class="listing-img">
+          <img src="${imgs[0] || ''}" alt="${p.address}" loading="lazy" onerror="this.parentElement.style.background='#e0d8cc'">
+          <div class="listing-tag">${p.tag || p.market}</div>
+          <div class="listing-deposit">${p.deposit}</div>
+        </div>
+        <div class="listing-info">
+          <div class="listing-price">${p.price}</div>
+          <div class="listing-addr">${p.address}</div>
+          <div class="listing-specs">
+            ${p.beds ? `<div class="spec"><div class="spec-dot"></div>${p.beds} Beds</div>` : ''}
+            ${p.baths ? `<div class="spec"><div class="spec-dot"></div>${p.baths} Baths</div>` : ''}
+            ${p.sqft ? `<div class="spec"><div class="spec-dot"></div>${p.sqft} sqft</div>` : ''}
+            ${p.status ? `<div class="spec"><div class="spec-dot"></div>${p.status}</div>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderShowcase(props) {
+    const grid = document.getElementById('showcaseGrid');
+    if (!grid || !props.length) return;
+    grid.innerHTML = props.slice(0, 4).map((p, i) => showcaseCardHTML(p, i === 0)).join('');
+    const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1 });
+    grid.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  }
+
+  async function loadShowcase() {
+    const cached = getCache();
+    if (cached) renderShowcase(cached);
+
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/properties?order=id.asc&select=id,tag,price,deposit,address,market,status,beds,baths,sqft,images`,
+        { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+      );
+      if (!res.ok) return;
+      const fresh = await res.json();
+      setCache(fresh);
+      renderShowcase(fresh);
+    } catch(e) {}
+  }
+
+  loadShowcase();
 </script>
 </body>
 </html>

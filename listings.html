@@ -88,6 +88,17 @@
   .footer-links a { font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.38); text-decoration: none; transition: color 0.3s; }
   .footer-links a:hover { color: var(--gold); }
 
+  /* SKELETON */
+  @keyframes shimmer { 0%{background-position:-800px 0} 100%{background-position:800px 0} }
+  .skeleton { background: linear-gradient(90deg, #ede8e1 25%, #e0d8cc 50%, #ede8e1 75%); background-size: 800px 100%; animation: shimmer 1.4s infinite; }
+  .skel-card { background: white; overflow: hidden; box-shadow: 0 2px 20px rgba(0,0,0,0.07); }
+  .skel-img { height: 240px; }
+  .skel-body { padding: 22px 24px 26px; }
+  .skel-line { height: 14px; border-radius: 2px; margin-bottom: 10px; }
+  .skel-line.w80 { width: 80%; }
+  .skel-line.w50 { width: 50%; }
+  .skel-line.w30 { width: 30%; height: 28px; margin-bottom: 14px; }
+
   /* REVEAL */
   .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
   .reveal.visible { opacity: 1; transform: translateY(0); }
@@ -189,20 +200,27 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVreW9xYnpnYXhocXRyaHNobHhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDAxNzQsImV4cCI6MjA4ODIxNjE3NH0.8vyzhjFGTGnbe5k7uZMxsQD6DoX4f4HZtcHkjaXxHWU';
   const CACHE_KEY = 'bt_properties_cache';
 
-  // ── SEED: baked-in properties for instant render (no network wait) ──
-  const SEED_DATA = [
-    {id:1,tag:"New Construction",price:"From $299,990",deposit:"$1,000",address:"Forney · Kaufman County, TX",market:"DFW",beds:4,baths:3,sqft:"2,100+",tags:["dfw","new-construction","low-deposit"],images:["https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80"]},
-    {id:2,tag:"Move-In Ready",price:"From $349,990",deposit:"$3,500",address:"Royse City · Rockwall County, TX",market:"DFW",beds:4,baths:3.5,sqft:"2,650",tags:["dfw","new-construction"],images:["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80"]},
-    {id:3,tag:"To Be Built",price:"From $275,000",deposit:"$1,000",address:"Josephine · Collin County, TX",market:"DFW",beds:3,baths:2,sqft:"1,800",tags:["dfw","new-construction","low-deposit"],images:["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80"]},
-    {id:4,tag:"Gated Community",price:"From $425,000",deposit:"$5,000",address:"Prosper · Collin County, TX",market:"DFW",beds:5,baths:4,sqft:"3,200",tags:["dfw","new-construction"],images:["https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80"]},
-    {id:5,tag:"New Construction",price:"From $289,990",deposit:"$1,000",address:"Rosharon · Brazoria County, TX",market:"Houston",beds:4,baths:3,sqft:"2,200",tags:["houston","new-construction","low-deposit"],images:["https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80"]},
-    {id:6,tag:"Move-In Ready",price:"From $319,990",deposit:"$2,500",address:"Conroe · Montgomery County, TX",market:"Houston",beds:4,baths:3,sqft:"2,400",tags:["houston","new-construction"],images:["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"]},
-    {id:7,tag:"New Construction",price:"From $260,000",deposit:"$1,000",address:"Texas City · Galveston County, TX",market:"Houston",beds:3,baths:2.5,sqft:"1,950",tags:["houston","new-construction","low-deposit"],images:["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80"]},
-    {id:8,tag:"Energy Efficient",price:"From $379,990",deposit:"$3,000",address:"Sugar Land · Fort Bend County, TX",market:"Houston",beds:4,baths:3.5,sqft:"2,850",tags:["houston","new-construction"],images:["https://images.unsplash.com/photo-1502005097973-6a7082348e28?w=800&q=80"]}
-  ];
-
   function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('open');document.getElementById('hamburger').classList.toggle('open');}
   function closeMenu(){document.getElementById('mobileMenu').classList.remove('open');document.getElementById('hamburger').classList.remove('open');}
+
+  function getCache() {
+    try { const c = JSON.parse(localStorage.getItem(CACHE_KEY)); return c && c.data ? c.data : null; } catch(e) { return null; }
+  }
+  function setCache(data) {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
+  }
+
+  function skeletonGrid() {
+    return Array(6).fill(0).map((_, i) => `
+      <div class="skel-card d${(i%3)+1}">
+        <div class="skel-img skeleton"></div>
+        <div class="skel-body">
+          <div class="skel-line w30 skeleton"></div>
+          <div class="skel-line w80 skeleton"></div>
+          <div class="skel-line w50 skeleton"></div>
+        </div>
+      </div>`).join('');
+  }
 
   function cardHTML(p) {
     const tags = Array.isArray(p.tags) ? p.tags.join(' ') : '';
@@ -230,71 +248,53 @@
   let ALL_PROPS = [];
   let activeFilter = 'all';
 
-  function getCache() {
-    try {
-      const c = JSON.parse(localStorage.getItem(CACHE_KEY));
-      if (c && c.data) return c.data;
-    } catch(e) {}
-    return null;
-  }
-
-  function setCache(data) {
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
-  }
-
   function renderGrid(props) {
     const grid = document.getElementById('grid');
     grid.innerHTML = props.map(cardHTML).join('');
     document.getElementById('count').textContent = props.length;
-    initReveal();
+    const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1 });
+    grid.querySelectorAll('.reveal').forEach(el => obs.observe(el));
   }
 
   function filterCards(tag, btn) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     activeFilter = tag;
-    const filtered = tag === 'all'
-      ? ALL_PROPS
-      : ALL_PROPS.filter(p => Array.isArray(p.tags) && p.tags.includes(tag));
+    const filtered = tag === 'all' ? ALL_PROPS : ALL_PROPS.filter(p => Array.isArray(p.tags) && p.tags.includes(tag));
     renderGrid(filtered);
   }
 
-  function initReveal() {
-    const els = document.querySelectorAll('.reveal:not(.visible)');
-    const obs = new IntersectionObserver(entries => entries.forEach(e => {
-      if (e.isIntersecting) e.target.classList.add('visible');
-    }), { threshold: 0.1 });
-    els.forEach(el => obs.observe(el));
-  }
-
   async function loadListings() {
+    const grid = document.getElementById('grid');
     const loading = document.getElementById('listings-loading');
+    loading.style.display = 'none';
 
-    // 1. INSTANT — show cached data if available, seed only as last resort
+    // Show cached instantly, skeleton if no cache
     const cached = getCache();
     if (cached) {
       ALL_PROPS = cached;
-      loading.style.display = 'none';
       renderGrid(ALL_PROPS);
     } else {
-      // Show seed while we wait — marked as temporary
-      ALL_PROPS = SEED_DATA;
-      loading.style.display = 'none';
-      renderGrid(ALL_PROPS);
+      grid.innerHTML = skeletonGrid();
     }
 
-    // 2. ALWAYS fetch fresh from Supabase — it is the truth
+    // Always fetch fresh from Supabase — it is the only source of truth
     try {
       const res = await fetch(
         `${SUPABASE_URL}/rest/v1/properties?order=id.asc&select=id,tag,badge,price,deposit,address,market,status,beds,baths,sqft,images,tags`,
         { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
       );
-      if (!res.ok) return;
+      if (!res.ok) throw new Error();
       const fresh = await res.json();
       setCache(fresh);
-      ALL_PROPS = fresh; // Always override seed/cache with real data
+      ALL_PROPS = fresh;
       renderGrid(activeFilter === 'all' ? ALL_PROPS : ALL_PROPS.filter(p => Array.isArray(p.tags) && p.tags.includes(activeFilter)));
-    } catch(e) { /* silent — already showing seed/cache */ }
+    } catch(e) {
+      if (!cached) {
+        grid.innerHTML = '';
+        document.getElementById('listings-error').style.display = 'block';
+      }
+    }
   }
 
   loadListings();
