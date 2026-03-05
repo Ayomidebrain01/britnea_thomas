@@ -273,6 +273,19 @@ const GITHUB_REPO = 'britnea_thomas';
 const CDN_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/properties.json`;
 const CACHE_KEY = 'bt_properties_cache';
 
+function getCached() {
+  try {
+    const c = JSON.parse(localStorage.getItem(CACHE_KEY));
+    if (c && Array.isArray(c.data)) return c.data;
+    localStorage.removeItem(CACHE_KEY);
+    return null;
+  } catch(e) { localStorage.removeItem(CACHE_KEY); return null; }
+}
+
+function setCached(data) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
+}
+
 let ALL_PROPERTIES = [];
 let CURRENT_IMAGES = [];
 
