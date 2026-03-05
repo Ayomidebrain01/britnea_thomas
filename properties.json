@@ -54,7 +54,48 @@
     "sqft": "",
     "garage": 2,
     "map_query": "",
-    "description": "A home that just makes sense Ã¢ÂÂ designed the way a home is truly intended to feel. 4 spacious bedrooms and 5 spa-inspired bathrooms, a private office for productivity, an elegant dining room for unforgettable gatherings, and a media room plus game room made for entertaining. A huge backyard with endless possibilities, custom grade finishes throughout, super low tax rate, and zoned to exemplary schools. This isn't just square footage Ã¢ÂÂ it's space for legacy, laughter, and living well.",
+    "description": "A home that just makes sense ÃÂ¢ÃÂÃÂ designed the way a home is truly intended to feel. 4 spacious bedrooms and 5 spa-inspired bathrooms, a private office for productivity, an elegant dining room for unforgettable gatherings, and a media room plus game room made for entertaining. A huge backyard with endless possibilities, custom grade finishes throughout, super low tax rate, and zoned to exemplary schools. This isn't just square footage ÃÂ¢ÃÂÃÂ it's space for legacy, laughter, and living well.",
+    "features": [
+      "4 Spacious Bedrooms",
+      "5 Spa-Inspired Bathrooms",
+      "Private Office",
+      "Elegant Dining Room",
+      "2-Car Garage",
+      "Media Room",
+      "Game Room",
+      "Huge Backyard",
+      "Custom Grade Finishes",
+      "Super Low Tax Rate",
+      "Zoned to Exemplary Schools"
+    ],
+    "images": [
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772712402/c46ru6kuy29abhvh3kiw.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772712406/ks1raphpujqekohpjwuh.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772712415/nk6ksodqy9y2vug67hb9.jpg"
+    ],
+    "image": "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772712402/c46ru6kuy29abhvh3kiw.jpg",
+    "video": null,
+    "tags": [
+      "dfw",
+      "new-construction"
+    ]
+  },
+  {
+    "id": 1772712819864,
+    "tag": "Copy of Elevated Living",
+    "badge": "$10000 Deposit",
+    "price": "Contact for Price",
+    "deposit": "$10000",
+    "address": "25 minutes Dallas,TX (Copy)",
+    "area": "",
+    "market": "DFW",
+    "status": "New Construction",
+    "beds": 4,
+    "baths": 5,
+    "sqft": "",
+    "garage": 2,
+    "map_query": "",
+    "description": "A home that just makes sense ÃÂ¢ÃÂÃÂ designed the way a home is truly intended to feel. 4 spacious bedrooms and 5 spa-inspired bathrooms, a private office for productivity, an elegant dining room for unforgettable gatherings, and a media room plus game room made for entertaining. A huge backyard with endless possibilities, custom grade finishes throughout, super low tax rate, and zoned to exemplary schools. This isn't just square footage ÃÂ¢ÃÂÃÂ it's space for legacy, laughter, and living well.",
     "features": [
       "4 Spacious Bedrooms",
       "5 Spa-Inspired Bathrooms",
