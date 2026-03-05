@@ -537,27 +537,18 @@
 
 <script>
 // ═══════════════════════════════════════════════
-//  STORAGE — GitHub JSON file
+//  STORAGE — via Netlify function (token is hidden server-side)
 // ═══════════════════════════════════════════════
 
-// ── CONFIG: fill these in after creating your GitHub token ──
-const GITHUB_USER  = 'Ayomidebrain01';
-const GITHUB_REPO  = 'britnea_thomas';
-const GITHUB_TOKEN = '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'; // paste your token here
-const JSON_PATH    = 'properties.json';
+const PROXY_URL = '/.netlify/functions/properties';
+const CDN_URL   = 'https://cdn.jsdelivr.net/gh/Ayomidebrain01/britnea_thomas@main/properties.json';
 
-const GITHUB_API = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${JSON_PATH}`;
-const CDN_URL    = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@main/${JSON_PATH}`;
-
-let _fileSHA = null; // needed for GitHub file updates
+let _fileSHA = null;
 
 const db = {
   async getAll() {
     try {
-      // Use API (not CDN) in admin so we always get latest + SHA
-      const res = await fetch(GITHUB_API, {
-        headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' }
-      });
+      const res = await fetch(PROXY_URL);
       if (!res.ok) return [];
       const data = await res.json();
       _fileSHA = data.sha;
@@ -569,14 +560,17 @@ const db = {
     try {
       const content = btoa(unescape(encodeURIComponent(JSON.stringify(props, null, 2))));
       const body = { message: 'Update properties', content, sha: _fileSHA };
-      const res = await fetch(GITHUB_API, {
+      const res = await fetch(PROXY_URL, {
         method: 'PUT',
-        headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      if (res.ok) { const d = await res.json(); _fileSHA = d.content.sha; }
-      return res.ok;
-    } catch(e) { return false; }
+      if (res.ok) { const d = await res.json(); _fileSHA = d.content.sha; return true; }
+      const err = await res.json();
+      const msg = err.message || `Error ${res.status}`;
+      if (res.status === 422) throw new Error('SHA mismatch — reload and try again');
+      throw new Error(msg);
+    } catch(e) { toast('Save failed: ' + e.message, 'error'); return false; }
   },
 
   async insert(prop) {
@@ -1088,25 +1082,6 @@ function checkAuth() {
 //  INIT
 // ═══════════════════════════════════════════════
 function initApp() {
-  if (!GITHUB_USER || !GITHUB_REPO || !GITHUB_TOKEN) {
-    document.getElementById('view-dashboard').innerHTML = `
-      <div style="padding:48px 40px;max-width:600px">
-        <div style="font-size:0.62rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Setup Required</div>
-        <div style="font-size:1.4rem;font-weight:300;color:var(--text);margin-bottom:12px">Connect Your GitHub Repo</div>
-        <div style="font-size:0.85rem;color:var(--muted);line-height:1.8;margin-bottom:28px">
-          To use the admin panel, open <code style="background:var(--panel);color:var(--gold);padding:2px 8px">admin.html</code> and fill in these 3 lines at the top of the script:
-        </div>
-        <div style="background:var(--panel);border:1px solid var(--border);padding:20px 24px;font-family:monospace;font-size:0.82rem;line-height:2;color:var(--text)">
-          const GITHUB_USER &nbsp;= <span style="color:#52C97A">'your-github-username'</span>;<br>
-          const GITHUB_REPO &nbsp;= <span style="color:#52C97A">'britnae-thomas'</span>;<br>
-          const GITHUB_TOKEN = <span style="color:#52C97A">'ghp_xxxxxxxxxxxx'</span>;
-        </div>
-        <div style="font-size:0.8rem;color:var(--muted);margin-top:20px;line-height:1.8">
-          Get your token at <a href="https://github.com/settings/tokens/new" target="_blank" style="color:var(--gold)">github.com/settings/tokens</a> → Generate new token (classic) → check <strong style="color:var(--text)">repo</strong> scope → copy the token.
-        </div>
-      </div>`;
-    return;
-  }
   renderDashboard();
   initForm();
 }
