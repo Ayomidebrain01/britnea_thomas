@@ -196,7 +196,10 @@
 </footer>
 
 <script>
-  const CDN_URL = '/.netlify/functions/properties';
+  const GITHUB_USER = 'Ayomidebrain01';
+  const GITHUB_REPO = 'britnea_thomas';
+  const CDN_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/properties.json`;
+  const CACHE_KEY = 'bt_properties_cache';
 
   function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('open');document.getElementById('hamburger').classList.toggle('open');}
   function closeMenu(){document.getElementById('mobileMenu').classList.remove('open');document.getElementById('hamburger').classList.remove('open');}
