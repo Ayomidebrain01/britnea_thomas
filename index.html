@@ -581,9 +581,7 @@
     document.getElementById('hamburger').classList.remove('open');
   }
 
-  const GITHUB_USER = 'Ayomidebrain01'; // your GitHub username
-  const GITHUB_REPO = 'britnea_thomas'; // e.g. britnae-thomas
-  const CDN_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@main/properties.json`;
+  const CDN_URL = '/.netlify/functions/properties';
 
   function showcaseCardHTML(p, featured) {
     const imgs = Array.isArray(p.images) ? p.images : [];
@@ -618,7 +616,7 @@
   async function loadShowcase() {
     try {
       const res = await fetch(
-        CDN_URL + '?t=' + Date.now()
+        CDN_URL
       );
       if (!res.ok) return;
       const fresh = await res.json();

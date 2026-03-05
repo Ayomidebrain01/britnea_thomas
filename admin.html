@@ -541,14 +541,14 @@
 // ═══════════════════════════════════════════════
 
 const PROXY_URL = '/.netlify/functions/properties';
-const CDN_URL   = 'https://cdn.jsdelivr.net/gh/Ayomidebrain01/britnea_thomas@main/properties.json';
+const CDN_URL   = 'https://raw.githubusercontent.com/Ayomidebrain01/britnea_thomas/main/properties.json';
 
 let _fileSHA = null;
 
 const db = {
   async getAll() {
     try {
-      const res = await fetch(PROXY_URL);
+      const res = await fetch(PROXY_URL + '?admin=1');
       if (!res.ok) return [];
       const data = await res.json();
       _fileSHA = data.sha;

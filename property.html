@@ -268,9 +268,7 @@
 // ═══════════════════════════════════════════
 //  PROPERTY DATA STORE — all 8 listings
 // ═══════════════════════════════════════════
-const GITHUB_USER = 'Ayomidebrain01'; // your GitHub username
-const GITHUB_REPO = 'britnea_thomas'; // e.g. britnae-thomas
-const CDN_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@main/properties.json`;
+const CDN_URL = '/.netlify/functions/properties';
 const CACHE_KEY = 'bt_properties_cache';
 
 let ALL_PROPERTIES = [];
@@ -597,7 +595,7 @@ async function loadProperty() {
 
   try {
     // Fetch from jsDelivr CDN — served from global edge, no cold start
-    const res = await fetch(CDN_URL + '?t=' + Date.now());
+    const res = await fetch(CDN_URL);
     if (!res.ok) throw new Error('Failed to load');
     const allArr = await res.json();
 
