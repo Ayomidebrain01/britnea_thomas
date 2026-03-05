@@ -63,8 +63,10 @@
       "Family Friendly Community",
       "Thoughtfully Designed Layout"
     ],
-    "images": [],
-    "image": "",
+    "images": [
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772707553/x5nxgva90dsfeazyey3w.jpg"
+    ],
+    "image": "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772707553/x5nxgva90dsfeazyey3w.jpg",
     "video": null,
     "tags": [
       "dfw"
