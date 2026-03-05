@@ -37,9 +37,9 @@
   {
     "id": 1772705863162,
     "tag": "Copy of Affordable Luxury",
-    "badge": "$5000 Deposit",
+    "badge": "$7000 Deposit",
     "price": "Contact for Price",
-    "deposit": "$5000",
+    "deposit": "$7000",
     "address": "Dallas,TX (Copy)",
     "area": "",
     "market": "DFW",
@@ -65,8 +65,7 @@
     "image": "",
     "video": null,
     "tags": [
-      "dfw",
-      "low-deposit"
+      "dfw"
     ]
   }
 ]
