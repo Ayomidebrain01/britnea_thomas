@@ -581,7 +581,10 @@
     document.getElementById('hamburger').classList.remove('open');
   }
 
-  const CDN_URL = '/.netlify/functions/properties';
+  const GITHUB_USER = 'Ayomidebrain01';
+  const GITHUB_REPO = 'britnea_thomas';
+  const CDN_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/properties.json`;
+  const CACHE_KEY = 'bt_properties_cache';
 
   function showcaseCardHTML(p, featured) {
     const imgs = Array.isArray(p.images) ? p.images : [];
@@ -616,7 +619,7 @@
   async function loadShowcase() {
     try {
       const res = await fetch(
-        CDN_URL
+        CDN_URL + '?t=' + Date.now()
       );
       if (!res.ok) return;
       const fresh = await res.json();
