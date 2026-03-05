@@ -54,7 +54,7 @@
     "sqft": "",
     "garage": 2,
     "map_query": "",
-    "description": "A home that just makes sense ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ designed the way a home is truly intended to feel. 4 spacious bedrooms and 5 spa-inspired bathrooms, a private office for productivity, an elegant dining room for unforgettable gatherings, and a media room plus game room made for entertaining. A huge backyard with endless possibilities, custom grade finishes throughout, super low tax rate, and zoned to exemplary schools. This isn't just square footage ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ it's space for legacy, laughter, and living well.",
+    "description": "A home that just makes sense ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ designed the way a home is truly intended to feel. 4 spacious bedrooms and 5 spa-inspired bathrooms, a private office for productivity, an elegant dining room for unforgettable gatherings, and a media room plus game room made for entertaining. A huge backyard with endless possibilities, custom grade finishes throughout, super low tax rate, and zoned to exemplary schools. This isn't just square footage ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ it's space for legacy, laughter, and living well.",
     "features": [
       "4 Spacious Bedrooms",
       "5 Spa-Inspired Bathrooms",
@@ -87,6 +87,45 @@
     "price": "Contact for Price",
     "deposit": "$5000",
     "address": "30 minutes from Dallas,TX",
+    "area": "",
+    "market": "DFW",
+    "status": "Move-In Ready",
+    "beds": 4,
+    "baths": 3,
+    "sqft": "",
+    "garage": 1,
+    "map_query": "",
+    "description": "Luxury living with space to entertain and relax. 4 spacious bedrooms, 3 beautiful bathrooms, and an entertainment room designed for movie nights and game days. This home blends custom-grade finishes with thoughtful design, creating the perfect space for family, friends, and unforgettable gatherings. Step outside and enjoy resort-style amenities including a lazy river, scenic walking trails, and community spaces that make every day feel like a getaway. A home that offers comfort, style, and a lifestyle you deserve.",
+    "features": [
+      "4 Spacious Bedrooms",
+      "3 Beautiful Bathrooms",
+      "Entertainment Room",
+      "Custom-Grade Finishes",
+      "Resort-Style Amenities",
+      "Lazy River",
+      "Scenic Walking Trails",
+      "Community Spaces",
+      "Custom Grade Finishes",
+      "Movie & Game Room",
+      "Luxury Finishes"
+    ],
+    "images": [
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772713165/d9otasnbhmhvzz3fu0p2.jpg"
+    ],
+    "image": "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772713165/d9otasnbhmhvzz3fu0p2.jpg",
+    "video": "https://drive.google.com/uc?export=download&id=1PiEzPDscnuXXD_Y6D6eGE5H-3WY-2aSe",
+    "tags": [
+      "dfw",
+      "low-deposit"
+    ]
+  },
+  {
+    "id": 1772713756007,
+    "tag": "Copy of Luxury Living",
+    "badge": "$5000 Deposit",
+    "price": "Contact for Price",
+    "deposit": "$5000",
+    "address": "30 minutes from Dallas,TX (Copy)",
     "area": "",
     "market": "DFW",
     "status": "Move-In Ready",
