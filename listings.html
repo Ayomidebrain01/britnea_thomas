@@ -239,10 +239,24 @@
   let ALL_PROPS = [];
   let activeFilter = 'all';
 
+  function getCache() {
+    try {
+      const c = JSON.parse(localStorage.getItem(CACHE_KEY));
+      if (c && Array.isArray(c.data)) return c.data;
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    } catch(e) { localStorage.removeItem(CACHE_KEY); return null; }
+  }
+
+  function setCache(data) {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
+  }
+
   function renderGrid(props) {
+    const list = Array.isArray(props) ? props : [];
     const grid = document.getElementById('grid');
-    grid.innerHTML = props.map(cardHTML).join('');
-    document.getElementById('count').textContent = props.length;
+    grid.innerHTML = list.length ? list.map(cardHTML).join('') : '<div style="padding:60px;text-align:center;color:var(--soft)">No listings found.</div>';
+    document.getElementById('count').textContent = list.length;
     const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1 });
     grid.querySelectorAll('.reveal').forEach(el => obs.observe(el));
   }
@@ -258,18 +272,30 @@
   async function loadListings() {
     const grid = document.getElementById('grid');
     document.getElementById('listings-loading').style.display = 'none';
-    grid.innerHTML = skeletonGrid();
 
-    try {
-      const res = await fetch(
-        CDN_URL
-      );
-      if (!res.ok) throw new Error();
-      ALL_PROPS = await res.json();
+    // Show cached instantly if available
+    const cached = getCache();
+    if (cached && Array.isArray(cached)) {
+      ALL_PROPS = cached;
       renderGrid(ALL_PROPS);
+    } else {
+      grid.innerHTML = skeletonGrid();
+    }
+
+    // Always fetch fresh
+    try {
+      const res = await fetch(CDN_URL + '?t=' + Date.now());
+      if (!res.ok) throw new Error();
+      const fresh = await res.json();
+      if (!Array.isArray(fresh)) throw new Error('Invalid data');
+      setCache(fresh);
+      ALL_PROPS = fresh;
+      renderGrid(activeFilter === 'all' ? ALL_PROPS : ALL_PROPS.filter(p => Array.isArray(p.tags) && p.tags.includes(activeFilter)));
     } catch(e) {
-      grid.innerHTML = '';
-      document.getElementById('listings-error').style.display = 'block';
+      if (!ALL_PROPS.length) {
+        grid.innerHTML = '';
+        document.getElementById('listings-error').style.display = 'block';
+      }
     }
   }
 
