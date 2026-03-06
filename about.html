@@ -421,14 +421,16 @@
     document.getElementById('leadPopup').classList.remove('show');
     localStorage.setItem(LEAD_KEY, 'dismissed');
   }
-  function submitLead() {
+  async function submitLead() {
     const name  = document.getElementById('leadName').value.trim();
     const email = document.getElementById('leadEmail').value.trim();
     if (!email) { document.getElementById('leadEmail').focus(); return; }
     try {
-      const leads = JSON.parse(localStorage.getItem(LEADS_KEY) || '[]');
-      leads.unshift({ id: Date.now(), name, email, date: new Date().toLocaleDateString(), page: window.location.pathname });
-      localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+      await fetch('https://britnea-thomas.vercel.app/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, page: window.location.pathname })
+      });
     } catch(e) {}
     localStorage.setItem(LEAD_KEY, 'subscribed');
     document.getElementById('leadForm').style.display = 'none';

@@ -779,7 +779,7 @@ async function loadProperty() {
 
 loadProperty();
 
-function submitEnquiry() {
+async function submitEnquiry() {
   const name  = document.getElementById('enq-name')?.value.trim();
   const email = document.getElementById('enq-email')?.value.trim();
   const msg   = document.getElementById('enq-msg')?.value.trim();
@@ -787,9 +787,11 @@ function submitEnquiry() {
   const propId = new URLSearchParams(window.location.search).get('id');
   const propAddress = document.querySelector('.prop-address')?.textContent || '';
   try {
-    const enqs = JSON.parse(localStorage.getItem('bt_enquiries') || '[]');
-    enqs.unshift({ id: Date.now(), name, email, message: msg, propId, propAddress, read: false, date: new Date().toLocaleDateString() });
-    localStorage.setItem('bt_enquiries', JSON.stringify(enqs));
+    await fetch('https://britnea-thomas.vercel.app/api/enquiries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, message: msg, propId, propAddress })
+    });
   } catch(e) {}
   document.getElementById('enq-name').value = '';
   document.getElementById('enq-email').value = '';
@@ -856,14 +858,16 @@ function shareProp() {
     document.getElementById('leadPopup').classList.remove('show');
     localStorage.setItem(LEAD_KEY, 'dismissed');
   }
-  function submitLead() {
+  async function submitLead() {
     const name  = document.getElementById('leadName').value.trim();
     const email = document.getElementById('leadEmail').value.trim();
     if (!email) { document.getElementById('leadEmail').focus(); return; }
     try {
-      const leads = JSON.parse(localStorage.getItem(LEADS_KEY) || '[]');
-      leads.unshift({ id: Date.now(), name, email, date: new Date().toLocaleDateString(), page: window.location.pathname });
-      localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+      await fetch('https://britnea-thomas.vercel.app/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, page: window.location.pathname })
+      });
     } catch(e) {}
     localStorage.setItem(LEAD_KEY, 'subscribed');
     document.getElementById('leadForm').style.display = 'none';

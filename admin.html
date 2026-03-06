@@ -1317,10 +1317,8 @@ function toast(msg, type = '') {
 //  ANALYTICS
 // ═══════════════════════════════════════════════
 const VIEWS_KEY = 'bt_prop_views';
-const ENQ_KEY   = 'bt_enquiries';
 
 function getViews() { try { return JSON.parse(localStorage.getItem(VIEWS_KEY)) || {}; } catch(e) { return {}; } }
-function getEnquiries() { try { return JSON.parse(localStorage.getItem(ENQ_KEY)) || []; } catch(e) { return []; } }
 
 // Call this from property page to track a view
 window.trackView = function(propId) {
@@ -1339,9 +1337,21 @@ window.trackEnquiry = function(name, email, phone, message, propId, propAddress)
 async function renderAnalytics() {
   const props = await db.getAll();
   const views = getViews();
-  const enqs  = getEnquiries();
 
-  const totalLeads  = JSON.parse(localStorage.getItem('bt_leads') || '[]').length;
+  let totalLeads = 0;
+  try {
+    const lr = await fetch('/api/leads?admin=1');
+    const lj = await lr.json();
+    const leadsArr = lj.content ? JSON.parse(atob(lj.content.replace(/\n/g,''))) : [];
+    totalLeads = leadsArr.length;
+  } catch(e) {}
+  let totalEnqCount = 0;
+  try {
+    const er = await fetch('/api/enquiries?admin=1');
+    const ej = await er.json();
+    const enqArr = ej.content ? JSON.parse(atob(ej.content.replace(/\n/g,''))) : [];
+    totalEnqCount = enqArr.length;
+  } catch(e) {}
   const totalViews = Object.values(views).reduce((a, b) => a + b, 0);
   const totalEnqs  = enqs.length;
   const sold       = props.filter(p => p.soldStatus === 'Sold').length;
@@ -1350,7 +1360,7 @@ async function renderAnalytics() {
 
   document.getElementById('analyticsStats').innerHTML = `
     <div class="analytics-card"><div class="analytics-val">${totalViews}</div><div class="analytics-key">Total Property Views</div></div>
-    <div class="analytics-card"><div class="analytics-val">${totalEnqs}</div><div class="analytics-key">Total Enquiries</div></div>
+    <div class="analytics-card"><div class="analytics-val">${totalEnqCount}</div><div class="analytics-key">Total Enquiries</div></div>
     <div class="analytics-card"><div class="analytics-val">${totalLeads}</div><div class="analytics-key">Leads Collected</div></div>
     <div class="analytics-card"><div class="analytics-val">${active}</div><div class="analytics-key">Active Listings</div></div>
     <div class="analytics-card"><div class="analytics-val">${sold}</div><div class="analytics-key">Sold</div></div>
@@ -1368,9 +1378,14 @@ async function renderAnalytics() {
       </div>`).join('')
     : '<div style="color:var(--muted);font-size:0.82rem">No listings yet.</div>';
 
-  // Enquiries bar chart
-  const enqByProp = {};
-  enqs.forEach(e => { enqByProp[e.propId] = (enqByProp[e.propId]||0)+1; });
+  // Enquiries bar chart — fetch from API
+  let enqByProp = {};
+  try {
+    const er = await fetch('/api/enquiries?admin=1');
+    const ej = await er.json();
+    const enqArr = ej.content ? JSON.parse(atob(ej.content.replace(/\n/g,''))) : [];
+    enqArr.forEach(e => { enqByProp[e.propId] = (enqByProp[e.propId]||0)+1; });
+  } catch(e) {}
   const maxEnq = Math.max(...props.map(p => enqByProp[p.id]||0), 1);
   document.getElementById('enqChart').innerHTML = props.length
     ? props.map(p => `
@@ -1382,25 +1397,38 @@ async function renderAnalytics() {
     : '<div style="color:var(--muted);font-size:0.82rem">No enquiries yet.</div>';
 }
 
-function renderLeads() {
-  const leads = JSON.parse(localStorage.getItem('bt_leads') || '[]');
-  document.getElementById('leadsCount').textContent = leads.length + ' lead' + (leads.length === 1 ? '' : 's') + ' collected';
-  if (!leads.length) {
-    document.getElementById('leadsList').innerHTML = '<div class="leads-empty">No leads yet. They will appear here when visitors subscribe from the popup on the site.</div>';
-    return;
+async function renderLeads() {
+  const list = document.getElementById('leadsList');
+  const countEl = document.getElementById('leadsCount');
+  list.innerHTML = '<div class="leads-empty">Loading...</div>';
+  try {
+    const res = await fetch('/api/leads?admin=1');
+    if (!res.ok) throw new Error('Failed to load');
+    const json = await res.json();
+    const leads = json.content
+      ? JSON.parse(atob(json.content.replace(/\n/g,'')))
+      : [];
+    countEl.textContent = leads.length + ' lead' + (leads.length === 1 ? '' : 's') + ' collected';
+    if (!leads.length) {
+      list.innerHTML = '<div class="leads-empty">No leads yet. They will appear here when visitors subscribe from the popup on the site.</div>';
+      return;
+    }
+    list.innerHTML = leads.map(l => `
+      <div class="lead-card">
+        <div>
+          <div class="lead-name">${l.name || 'No name provided'}</div>
+          <div class="lead-email">${l.email}</div>
+        </div>
+        <div class="lead-date">${l.date || ''}</div>
+      </div>`).join('');
+    window._cachedLeads = leads;
+  } catch(e) {
+    list.innerHTML = '<div class="leads-empty">Failed to load leads. Check your connection.</div>';
   }
-  document.getElementById('leadsList').innerHTML = leads.map(l => `
-    <div class="lead-card">
-      <div>
-        <div class="lead-name">${l.name || 'No name provided'}</div>
-        <div class="lead-email">${l.email}</div>
-      </div>
-      <div class="lead-date">${l.date || ''}</div>
-    </div>`).join('');
 }
 
-function exportLeads() {
-  const leads = JSON.parse(localStorage.getItem('bt_leads') || '[]');
+async function exportLeads() {
+  const leads = window._cachedLeads || [];
   if (!leads.length) { toast('No leads to export', 'error'); return; }
   const csv = 'Name,Email,Date\n' + leads.map(l => `"${l.name||''}","${l.email}","${l.date||''}"`).join('\n');
   const a = document.createElement('a');
@@ -1410,39 +1438,70 @@ function exportLeads() {
   toast('Leads exported!');
 }
 
-function clearLeads() {
+async function clearLeads() {
   if (!confirm('Clear all leads? This cannot be undone.')) return;
-  localStorage.removeItem('bt_leads');
-  renderLeads();
+  try {
+    const res = await fetch('/api/leads?admin=1');
+    const json = await res.json();
+    const sha = json.sha;
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify([]))));
+    await fetch('/api/leads', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'Clear leads', content, sha })
+    });
+    window._cachedLeads = [];
+    renderLeads();
+    toast('Leads cleared');
+  } catch(e) { toast('Failed to clear', 'error'); }
 }
 
-function renderEnquiries() {
-  const enqs = getEnquiries();
-  document.getElementById('enqCount').textContent = enqs.length + ' enquir' + (enqs.length === 1 ? 'y' : 'ies');
-  if (!enqs.length) {
-    document.getElementById('enquiriesList').innerHTML = '<div class="enq-empty">No enquiries yet. They will appear here when buyers fill out the contact form.</div>';
-    return;
+async function renderEnquiries() {
+  const list = document.getElementById('enquiriesList');
+  const countEl = document.getElementById('enqCount');
+  list.innerHTML = '<div class="enq-empty">Loading...</div>';
+  try {
+    const res = await fetch('/api/enquiries?admin=1');
+    if (!res.ok) throw new Error('Failed to load');
+    const json = await res.json();
+    const enqs = json.content
+      ? JSON.parse(atob(json.content.replace(/\n/g,'')))
+      : [];
+    countEl.textContent = enqs.length + ' enquir' + (enqs.length === 1 ? 'y' : 'ies');
+    if (!enqs.length) {
+      list.innerHTML = '<div class="enq-empty">No enquiries yet. They will appear here when buyers fill out the contact form.</div>';
+      return;
+    }
+    list.innerHTML = enqs.map(e => `
+      <div class="enquiry-card">
+        <div style="flex:1">
+          <div class="enquiry-name">${e.name || 'Anonymous'}</div>
+          <div class="enquiry-contact">${e.email || ''}${e.phone ? ' · ' + e.phone : ''}</div>
+          <div class="enquiry-msg">${e.message || ''}</div>
+          ${e.propAddress ? `<div class="enquiry-prop">Re: ${e.propAddress}</div>` : ''}
+        </div>
+        <div class="enquiry-meta">${e.date || ''}</div>
+      </div>`).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="enq-empty">Failed to load enquiries. Check your connection.</div>';
   }
-  // Mark all as read when viewed
-  const read = enqs.map(e => ({...e, read: true}));
-  localStorage.setItem(ENQ_KEY, JSON.stringify(read));
-
-  document.getElementById('enquiriesList').innerHTML = enqs.map(e => `
-    <div class="enquiry-card ${e.read ? '' : 'unread'}">
-      <div style="flex:1">
-        <div class="enquiry-name">${e.name || 'Anonymous'}${e.read ? '' : ' <span style="color:var(--gold);font-size:0.65rem">NEW</span>'}</div>
-        <div class="enquiry-contact">${e.email || ''}${e.phone ? ' · ' + e.phone : ''}</div>
-        <div class="enquiry-msg">${e.message || ''}</div>
-        ${e.propAddress ? `<div class="enquiry-prop">Re: ${e.propAddress}</div>` : ''}
-      </div>
-      <div class="enquiry-meta">${e.date || ''}</div>
-    </div>`).join('');
 }
 
-function clearEnquiries() {
+async function clearEnquiries() {
   if (!confirm('Clear all enquiries? This cannot be undone.')) return;
-  localStorage.removeItem(ENQ_KEY);
-  renderEnquiries();
+  try {
+    const res = await fetch('/api/enquiries?admin=1');
+    const json = await res.json();
+    const sha = json.sha;
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify([]))));
+    await fetch('/api/enquiries', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'Clear enquiries', content, sha })
+    });
+    renderEnquiries();
+    toast('Enquiries cleared');
+  } catch(e) { toast('Failed to clear', 'error'); }
 }
 
 // ═══════════════════════════════════════════════
