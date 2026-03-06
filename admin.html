@@ -988,7 +988,8 @@ async function duplicateProperty(id, btn) {
     ...original,
     id: Date.now(),
     tag: 'Copy of ' + (original.tag || original.market),
-    address: original.address + ' (Copy)'
+    address: original.address + ' (Copy)',
+    video: null  // video is not copied — each listing should have its own
   };
 
   const ok = await db.insert(copy);
