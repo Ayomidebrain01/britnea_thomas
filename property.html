@@ -843,6 +843,7 @@ function shareProp() {
 
 <script>
   // ── LEAD POPUP ──
+  (function() {
   const LEAD_KEY = 'bt_lead_seen';
   const LEADS_KEY = 'bt_leads';
 
@@ -874,6 +875,12 @@ function shareProp() {
   if (!localStorage.getItem(LEAD_KEY)) {
     setTimeout(openLead, 8000);
   }
+
+  // expose for onclick handlers
+  window.openLead = openLead;
+  window.closeLead = closeLead;
+  window.submitLead = submitLead;
+  })();
 
   // ── BACK TO TOP ──
   const backTopBtn = document.getElementById('backTop');

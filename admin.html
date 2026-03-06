@@ -696,16 +696,16 @@
 <div class="mobile-drawer-overlay" id="mobileDrawerOverlay" onclick="closeMobileDrawer()"></div>
 <div class="mobile-drawer" id="mobileDrawer">
   <div class="mobile-drawer-title">More</div>
-  <button class="mobile-drawer-item" onclick="showView('analytics'); setMobileNav(null); closeMobileDrawer()">
+  <button class="mobile-drawer-item" onclick="showView('analytics'); closeMobileDrawer()">
     <span class="m-icon">📈</span> Analytics
   </button>
-  <button class="mobile-drawer-item" onclick="showView('enquiries'); setMobileNav(null); closeMobileDrawer()">
+  <button class="mobile-drawer-item" onclick="showView('enquiries'); closeMobileDrawer()">
     <span class="m-icon">✉️</span> Enquiries
   </button>
-  <button class="mobile-drawer-item" onclick="showView('leads'); setMobileNav(null); closeMobileDrawer()">
+  <button class="mobile-drawer-item" onclick="showView('leads'); closeMobileDrawer()">
     <span class="m-icon">🎯</span> Leads
   </button>
-  <button class="mobile-drawer-item" onclick="showView('howto'); setMobileNav(null); closeMobileDrawer()">
+  <button class="mobile-drawer-item" onclick="showView('howto'); closeMobileDrawer()">
     <span class="m-icon">📖</span> How to Use
   </button>
 </div>
@@ -1514,7 +1514,7 @@ function closeMobileDrawer() {
 
 function setMobileNav(el) {
   document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
+  if (el) el.classList.add('active');
 }
 
 // ═══ IMAGE UPLOAD ═══
