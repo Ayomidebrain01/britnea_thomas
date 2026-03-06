@@ -205,8 +205,9 @@
   .lightbox-dot.active { background:var(--gold); }
 
   /* GALLERY VIDEO */
-  .gallery-video-wrap { width:100%; height:100%; }
-  .gallery-video-wrap iframe { width:100%; height:100%; border:none; }
+  .gallery-video-wrap { width:100%; height:100%; position:relative; background:#000; }
+  .gallery-video-wrap iframe { width:100%; height:100%; border:none; display:block; }
+  .gallery-video-wrap video { width:100%; height:100%; object-fit:cover; display:block; }
 
   /* BUTTONS */
   .btn-primary { background:var(--gold); color:var(--dark); padding:14px 28px; font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:600; text-decoration:none; display:inline-block; font-family:'Outfit',sans-serif; transition:background 0.2s; border:none; cursor:pointer; }
@@ -215,7 +216,7 @@
   /* RESPONSIVE */
   @media (max-width:1024px) {
     .prop-grid { grid-template-columns:1fr; }
-    .prop-right { position:static; }
+    .prop-right { position:static; order:-1; }
     .price-bar-specs { display:none; }
   }
   @media (max-width:768px) {
@@ -345,31 +346,39 @@ function render(prop) {
     <!-- MOBILE CAROUSEL -->
     <div class="carousel" id="carousel">
       <div class="carousel-track" id="carouselTrack">
-        ${imgs.map((src,i) => `<div class="carousel-slide"><img src="${src}" alt="${prop.address}" onclick="openLightbox(CURRENT_IMAGES,${i})"></div>`).join('') || '<div class="carousel-slide" style="background:var(--border);display:flex;align-items:center;justify-content:center;color:var(--soft)">No Photos</div>'}
+        ${prop.video ? `<div class="carousel-slide">
+          ${prop.video.includes('youtube') || prop.video.includes('vimeo')
+            ? `<div class="gallery-video-wrap"><iframe src="${prop.video}" allowfullscreen></iframe></div>`
+            : `<div class="gallery-video-wrap"><video controls playsinline><source src="${prop.video}" type="video/mp4"></video></div>`}
+        </div>` : ''}
+        ${imgs.map((src,i) => `<div class="carousel-slide"><img src="${src}" alt="${prop.address}" onclick="openLightbox(CURRENT_IMAGES,${i})"></div>`).join('') || (!prop.video ? '<div class="carousel-slide" style="background:var(--border);display:flex;align-items:center;justify-content:center;color:var(--soft)">No Photos</div>' : '')}
       </div>
       <button class="carousel-btn carousel-prev" onclick="carouselMove(-1)">&#8592;</button>
       <button class="carousel-btn carousel-next" onclick="carouselMove(1)">&#8594;</button>
       <div class="carousel-dots" id="carouselDots">
-        ${imgs.map((_,i) => `<button class="carousel-dot ${i===0?'active':''}" onclick="carouselGo(${i})"></button>`).join('') }
+        ${prop.video ? '<button class="carousel-dot active" onclick="carouselGo(0)"></button>' : ''}
+        ${imgs.map((_,i) => `<button class="carousel-dot ${!prop.video && i===0?'active':''}" onclick="carouselGo(${prop.video ? i+1 : i})"></button>`).join('')}
       </div>
-      <div class="carousel-counter" id="carouselCounter">1 / ${imgs.length || 0}</div>
+      <div class="carousel-counter" id="carouselCounter">1 / ${(prop.video ? 1 : 0) + imgs.length}</div>
     </div>
 
     <!-- DESKTOP PHOTO GRID -->
     <div class="photo-section">
       <div class="photo-grid">
-        <div class="photo-grid-main" onclick="openLightbox(CURRENT_IMAGES,0)">
+        <div class="photo-grid-main" onclick="${prop.video ? '' : `openLightbox(CURRENT_IMAGES,0)`}" style="${prop.video ? 'cursor:default' : ''}">
           ${prop.video
-            ? `<div class="gallery-video-wrap"><iframe src="${prop.video}" allowfullscreen></iframe></div>`
+            ? (prop.video.includes('youtube') || prop.video.includes('vimeo')
+                ? `<div class="gallery-video-wrap"><iframe src="${prop.video}" allowfullscreen></iframe></div>`
+                : `<div class="gallery-video-wrap"><video controls playsinline style="width:100%;height:100%;object-fit:cover;"><source src="${prop.video}" type="video/mp4"></video></div>`)
             : imgs[0] ? `<img src="${imgs[0]}" alt="${prop.address}">` : '<div style="background:var(--border);height:100%;"></div>'}
         </div>
-        ${imgs[1] ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,1)"><img src="${imgs[1]}" alt="View 2"></div>` : '<div style="background:#2a2a2a;"></div>'}
-        ${imgs[2] ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,2)"><img src="${imgs[2]}" alt="View 3"></div>` : '<div style="background:#222222;"></div>'}
-        ${imgs[3] && !imgs[4]
-          ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,3)"><img src="${imgs[3]}" alt="View 4"></div>`
-          : imgs[3]
-            ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,3)"><img src="${imgs[3]}" alt="More" style="filter:brightness(0.4)"><div class="photo-grid-more"><span>+${imgs.length-3} Photos</span></div></div>`
-            : '<div style="background:#1a1a1a;"></div>'}
+        ${imgs[prop.video?0:1] ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,${prop.video?0:1})"><img src="${imgs[prop.video?0:1]}" alt="View 2"></div>` : '<div style="background:#2a2a2a;"></div>'}
+        ${imgs[prop.video?1:2] ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,${prop.video?1:2})"><img src="${imgs[prop.video?1:2]}" alt="View 3"></div>` : '<div style="background:#222222;"></div>'}
+        ${imgs[prop.video?2:3]
+          ? (imgs[prop.video?3:4]
+              ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,${prop.video?2:3})"><img src="${imgs[prop.video?2:3]}" alt="More" style="filter:brightness(0.4)"><div class="photo-grid-more"><span>+${imgs.length - (prop.video?2:3)} Photos</span></div></div>`
+              : `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,${prop.video?2:3})"><img src="${imgs[prop.video?2:3]}" alt="View 4"></div>`)
+          : '<div style="background:#1a1a1a;"></div>'}
       </div>
       ${imgs.length > 1 ? `<button class="view-all-btn" onclick="openLightbox(CURRENT_IMAGES,0)">&#9776; View All ${imgs.length} Photos</button>` : ''}
     </div>
