@@ -237,6 +237,8 @@
   .listing-card:hover .listing-img img { transform: scale(1.05); }
   .listing-tag { position: absolute; top: 18px; left: 18px; background: var(--gold); color: var(--dark); font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; padding: 5px 12px; }
   .listing-deposit { position: absolute; top: 18px; right: 18px; background: rgba(14,14,14,0.82); color: white; font-size: 0.68rem; letter-spacing: 0.08em; padding: 5px 12px; backdrop-filter: blur(4px); }
+  .listing-new { position: absolute; top: 48px; left: 18px; background: #22C55E; color: white; font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; padding: 4px 10px; animation: newPulse 2s ease-in-out infinite; }
+  @keyframes newPulse { 0%,100%{opacity:1;} 50%{opacity:0.75;} }
   .listing-info { padding: 24px 26px 28px; }
   .listing-price { font-family: 'Outfit', sans-serif; font-size: 1.65rem; font-weight: 400; color: var(--dark); margin-bottom: 5px; }
   .listing-addr { font-size: 0.77rem; color: var(--soft); margin-bottom: 16px; }
@@ -633,6 +635,7 @@
         <div class="listing-img">
           <img src="${imgs[0] || ''}" alt="${p.address}" loading="lazy" onerror="this.parentElement.style.background='#e0d8cc'">
           <div class="listing-tag">${p.tag || p.market}</div>
+          ${(Date.now() - p.id) < 86400000 ? '<div class="listing-new">✦ New</div>' : ''}
           <div class="listing-deposit">${p.deposit}</div>
         </div>
         <div class="listing-info">

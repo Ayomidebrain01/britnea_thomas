@@ -84,6 +84,8 @@
   .card:hover .card-img img { transform: scale(1.05); }
   .card-tag { position: absolute; top: 16px; left: 16px; background: var(--gold); color: var(--dark); font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; padding: 5px 11px; }
   .card-badge { position: absolute; top: 16px; right: 16px; background: rgba(14,14,14,0.85); color: white; font-size: 0.65rem; padding: 5px 11px; backdrop-filter: blur(4px); }
+  .card-new { position: absolute; top: 46px; left: 16px; background: #22C55E; color: white; font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; padding: 4px 10px; animation: newPulse 2s ease-in-out infinite; }
+  @keyframes newPulse { 0%,100%{opacity:1;} 50%{opacity:0.75;} }
   .card-body { padding: 22px 24px 26px; }
   .card-price { font-size: 1.6rem; font-weight: 400; color: var(--dark); margin-bottom: 4px; }
   .card-addr { font-size: 0.76rem; color: var(--soft); margin-bottom: 14px; }
@@ -237,6 +239,10 @@
       </div>`).join('');
   }
 
+  function isNew(id) {
+    return Date.now() - id < 24 * 60 * 60 * 1000;
+  }
+
   function cardHTML(p) {
     const tags = Array.isArray(p.tags) ? p.tags.join(' ') : '';
     const imgs = Array.isArray(p.images) ? p.images : [];
@@ -245,6 +251,7 @@
         <div class="card-img">
           <img src="${imgs[0] || ''}" alt="${p.address}" loading="lazy" onerror="this.style.display='none'">
           <div class="card-tag">${p.tag || p.market}</div>
+          ${isNew(p.id) ? '<div class="card-new">✦ New</div>' : ''}
           <div class="card-badge">${p.deposit}</div>
         </div>
         <div class="card-body">
