@@ -316,5 +316,45 @@
       "dfw",
       "low-deposit"
     ]
+  },
+  {
+    "id": 1772757154875,
+    "tag": "Copy of Affordable Luxury",
+    "badge": "$5000 Deposit",
+    "price": "$399,000",
+    "deposit": "$5000",
+    "address": "30 minutes from Dallas,TX (Copy)",
+    "area": "Fortney",
+    "market": "DFW",
+    "status": "Move-In Ready",
+    "beds": 4,
+    "baths": 3,
+    "sqft": "2,188",
+    "garage": 2,
+    "map_query": "",
+    "description": "Luxury living without the luxury price tag. 2,188 sq. ft., 4 bedrooms, 3 bathrooms, single story, 2-car garage. Designed with growing families in mind, this beautiful single-story home offers the perfect balance of comfort, style, and affordability. Why continue paying high rent when you could invest in a home that gives you space, stability, and elevated living? Step into custom-grade  finishes, a thoughtfully designed layout, and a welcoming community filled with resort-style amenities and a friendly atmosphere you'll love coming home to. Affordable luxury meets everyday functionality in a home built for memories, entertaining, and your next chapter.",
+    "features": [
+      "4 Bedrooms",
+      "3 Bathrooms",
+      "2,188 Sq. Ft.",
+      "Single Story",
+      "2-Car Garage",
+      "Custom Grade Finishes",
+      "Resort-Style Amenities",
+      "Family Friendly Community",
+      "Thoughtfully Designed Layout"
+    ],
+    "images": [
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772712697/em2d04rxnfrmjkm4glkm.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772712700/ioz3qfnmcvepjfnyv4ha.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772712702/y5fz81fyah8mlqlmvysi.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772712703/u5kpenqdztk712g6bvuw.jpg"
+    ],
+    "image": "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772712697/em2d04rxnfrmjkm4glkm.jpg",
+    "video": null,
+    "tags": [
+      "dfw",
+      "low-deposit"
+    ]
   }
 ]
