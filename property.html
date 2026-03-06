@@ -49,8 +49,13 @@
   .photo-section { background:var(--dark); position:relative; }
 
   /* DESKTOP GRID GALLERY */
-  .photo-grid { display:grid; grid-template-columns:2fr 1fr 1fr; grid-template-rows:320px 220px; gap:3px; cursor:pointer; }
+  .photo-grid { display:grid; gap:3px; cursor:pointer; }
+  .photo-grid-1 { grid-template-columns:1fr; grid-template-rows:540px; }
+  .photo-grid-2 { grid-template-columns:2fr 1fr; grid-template-rows:540px; }
+  .photo-grid-3 { grid-template-columns:2fr 1fr; grid-template-rows:270px 270px; }
+  .photo-grid-4, .photo-grid-many { grid-template-columns:2fr 1fr 1fr; grid-template-rows:320px 220px; }
   .photo-grid-main { grid-row:span 2; overflow:hidden; position:relative; }
+  .photo-grid-2 .photo-grid-main, .photo-grid-1 .photo-grid-main { grid-row:span 1; }
   .photo-grid-thumb { overflow:hidden; position:relative; }
   .photo-grid-main img, .photo-grid-thumb img { width:100%; height:100%; object-fit:cover; transition:transform 0.4s; display:block; }
   .photo-grid-main:hover img, .photo-grid-thumb:hover img { transform:scale(1.03); }
@@ -367,22 +372,28 @@ function render(prop) {
 
     <!-- DESKTOP PHOTO GRID -->
     <div class="photo-section">
-      <div class="photo-grid">
-        <div class="photo-grid-main" onclick="${prop.video ? '' : `openLightbox(CURRENT_IMAGES,0)`}" style="${prop.video ? 'cursor:default' : ''}">
-          ${prop.video
-            ? (prop.video.includes('youtube') || prop.video.includes('vimeo')
-                ? `<div class="gallery-video-wrap"><iframe src="${prop.video}" allowfullscreen></iframe></div>`
-                : `<div class="gallery-video-wrap"><video controls playsinline style="width:100%;height:100%;object-fit:cover;"><source src="${prop.video}" type="video/mp4"></video></div>`)
-            : imgs[0] ? `<img src="${imgs[0]}" alt="${prop.address}">` : '<div style="background:var(--border);height:100%;"></div>'}
-        </div>
-        ${imgs[prop.video?0:1] ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,${prop.video?0:1})"><img src="${imgs[prop.video?0:1]}" alt="View 2"></div>` : '<div style="background:#2a2a2a;"></div>'}
-        ${imgs[prop.video?1:2] ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,${prop.video?1:2})"><img src="${imgs[prop.video?1:2]}" alt="View 3"></div>` : '<div style="background:#222222;"></div>'}
-        ${imgs[prop.video?2:3]
-          ? (imgs[prop.video?3:4]
-              ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,${prop.video?2:3})"><img src="${imgs[prop.video?2:3]}" alt="More" style="filter:brightness(0.4)"><div class="photo-grid-more"><span>+${imgs.length - (prop.video?2:3)} Photos</span></div></div>`
-              : `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,${prop.video?2:3})"><img src="${imgs[prop.video?2:3]}" alt="View 4"></div>`)
-          : '<div style="background:#1a1a1a;"></div>'}
-      </div>
+      ${(() => {
+        const count = imgs.length;
+        const gridClass = count === 1 ? 'photo-grid-1' : count === 2 ? 'photo-grid-2' : count === 3 ? 'photo-grid-3' : count === 4 ? 'photo-grid-4' : 'photo-grid-many';
+        const mainImg = prop.video
+          ? (prop.video.includes('youtube') || prop.video.includes('vimeo')
+              ? `<div class="gallery-video-wrap"><iframe src="${prop.video}" allowfullscreen></iframe></div>`
+              : `<div class="gallery-video-wrap"><video controls playsinline style="width:100%;height:100%;object-fit:cover;"><source src="${prop.video}" type="video/mp4"></video></div>`)
+          : imgs[0] ? `<img src="${imgs[prop.video?0:0]}" alt="${prop.address}">` : '';
+        const startIdx = prop.video ? 0 : 1;
+        const thumbs = imgs.slice(startIdx, startIdx + 4).map((src, i) => {
+          const realIdx = startIdx + i;
+          const isLast = realIdx === startIdx + 3 && imgs.length > startIdx + 4;
+          return `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,${realIdx})">
+            <img src="${src}" alt="View ${i+2}" ${isLast ? 'style="filter:brightness(0.4)"' : ''}>
+            ${isLast ? `<div class="photo-grid-more"><span>+${imgs.length - (startIdx+3)} Photos</span></div>` : ''}
+          </div>`;
+        }).join('');
+        return `<div class="photo-grid ${gridClass}">
+          <div class="photo-grid-main" onclick="${prop.video ? '' : `openLightbox(CURRENT_IMAGES,0)`}" style="${prop.video ? 'cursor:default' : ''}">${mainImg}</div>
+          ${thumbs}
+        </div>`;
+      })()}
       ${imgs.length > 1 ? `<button class="view-all-btn" onclick="openLightbox(CURRENT_IMAGES,0)">&#9776; View All ${imgs.length} Photos</button>` : ''}
     </div>
 
