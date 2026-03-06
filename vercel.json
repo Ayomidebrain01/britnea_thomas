@@ -11,5 +11,6 @@
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
       ]
     }
-  ]
+  ],
+  "ignoreCommand": "git diff --name-only HEAD^ HEAD | grep -qvE '\\.(html|css|json|md|txt|png|jpg|jpeg|gif|svg|ico)$'"
 }
