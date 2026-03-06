@@ -250,7 +250,16 @@
 
     /* Mobile bottom nav bar */
     .mobile-nav { display:flex; position:fixed; bottom:0; left:0; right:0; background:var(--panel); border-top:1px solid var(--border); z-index:100; padding:8px 0 12px; }
-    .mobile-nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:6px 4px; color:var(--muted); font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; transition:color 0.2s; border:none; background:none; font-family:'Outfit',sans-serif; }
+    /* ── MOBILE DRAWER ── */
+  .mobile-drawer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:197; }
+  .mobile-drawer-overlay.show { display:block; }
+  .mobile-drawer { position:fixed; bottom:-100%; left:0; right:0; z-index:198; background:var(--panel); border-top:1px solid var(--border); padding:8px 0 24px; transition:bottom 0.3s ease; border-radius:16px 16px 0 0; }
+  .mobile-drawer.show { bottom:60px; }
+  .mobile-drawer-title { font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); padding:14px 24px 8px; }
+  .mobile-drawer-item { display:flex; align-items:center; gap:14px; width:100%; background:none; border:none; color:var(--text); font-family:'Outfit',sans-serif; font-size:0.9rem; padding:14px 24px; cursor:pointer; text-align:left; transition:background 0.2s; }
+  .mobile-drawer-item:hover { background:var(--surface); color:var(--gold); }
+  .mobile-drawer-item .m-icon { font-size:1.1rem; }
+  .mobile-nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:6px 4px; color:var(--muted); font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; transition:color 0.2s; border:none; background:none; font-family:'Outfit',sans-serif; }
     .mobile-nav-item.active { color:var(--gold); }
     .mobile-nav-item .m-icon { font-size:1.2rem; }
     .content { padding-bottom:80px; }
@@ -678,10 +687,28 @@
   <button class="mobile-nav-item" onclick="showView('add'); initForm(); setMobileNav(this)">
     <span class="m-icon">➕</span>Add
   </button>
-  <button class="mobile-nav-item" onclick="showView('howto'); setMobileNav(this)">
-    <span class="m-icon">📖</span>Help
+  <button class="mobile-nav-item" onclick="toggleMobileDrawer()">
+    <span class="m-icon">⋯</span>More
   </button>
 </nav>
+
+<!-- MOBILE MORE DRAWER -->
+<div class="mobile-drawer-overlay" id="mobileDrawerOverlay" onclick="closeMobileDrawer()"></div>
+<div class="mobile-drawer" id="mobileDrawer">
+  <div class="mobile-drawer-title">More</div>
+  <button class="mobile-drawer-item" onclick="showView('analytics'); setMobileNav(null); closeMobileDrawer()">
+    <span class="m-icon">📈</span> Analytics
+  </button>
+  <button class="mobile-drawer-item" onclick="showView('enquiries'); setMobileNav(null); closeMobileDrawer()">
+    <span class="m-icon">✉️</span> Enquiries
+  </button>
+  <button class="mobile-drawer-item" onclick="showView('leads'); setMobileNav(null); closeMobileDrawer()">
+    <span class="m-icon">🎯</span> Leads
+  </button>
+  <button class="mobile-drawer-item" onclick="showView('howto'); setMobileNav(null); closeMobileDrawer()">
+    <span class="m-icon">📖</span> How to Use
+  </button>
+</div>
 <div class="modal-overlay" id="deleteModal">
   <div class="modal">
     <div class="modal-title">Delete Property?</div>
@@ -710,11 +737,26 @@ const db = {
   async getAll() {
     try {
       const res = await fetch(PROXY_URL + '?admin=1');
-      if (!res.ok) return [];
+      if (!res.ok) {
+        console.error('getAll failed — status:', res.status, res.statusText);
+        toast('Failed to load properties (' + res.status + ')', 'error');
+        return [];
+      }
       const data = await res.json();
+      if (!data.content) {
+        console.error('getAll — no content in response:', data);
+        toast('No content returned from API', 'error');
+        return [];
+      }
       _fileSHA = data.sha;
-      return JSON.parse(atob(data.content.replace(/\n/g, '')));
-    } catch(e) { return []; }
+      const decoded = JSON.parse(atob(data.content.replace(/\n/g, '')));
+      console.log('getAll — loaded', decoded.length, 'properties');
+      return decoded;
+    } catch(e) {
+      console.error('getAll error:', e);
+      toast('Error loading properties: ' + e.message, 'error');
+      return [];
+    }
   },
 
   async _save(props) {
@@ -1455,6 +1497,15 @@ function attemptLogin() {
 }
 
 // ═══ MOBILE NAV ═══
+function toggleMobileDrawer() {
+  document.getElementById('mobileDrawer').classList.toggle('show');
+  document.getElementById('mobileDrawerOverlay').classList.toggle('show');
+}
+function closeMobileDrawer() {
+  document.getElementById('mobileDrawer').classList.remove('show');
+  document.getElementById('mobileDrawerOverlay').classList.remove('show');
+}
+
 function setMobileNav(el) {
   document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
