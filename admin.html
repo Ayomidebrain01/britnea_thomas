@@ -18,6 +18,13 @@
   body { font-family:'Outfit',sans-serif; background:var(--dark); color:var(--text); min-height:100vh; }
 
   /* ── LOGIN SCREEN ── */
+  /* ── LEADS ── */
+  .lead-card { background:var(--panel); border:1px solid var(--border); padding:18px 24px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:16px; }
+  .lead-card.new-lead { border-left:3px solid var(--gold); }
+  .lead-name { font-size:0.9rem; font-weight:600; color:var(--text); margin-bottom:2px; }
+  .lead-email { font-size:0.8rem; color:var(--muted); }
+  .lead-date { font-size:0.68rem; color:var(--muted); text-align:right; white-space:nowrap; }
+  .leads-empty { padding:60px; text-align:center; color:var(--muted); font-size:0.88rem; }
   /* ── ANALYTICS ── */
   .analytics-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:28px; }
   .analytics-card { background:var(--panel); border:1px solid var(--border); padding:24px 20px; }
@@ -314,6 +321,9 @@
       </a>
       <a class="nav-item" onclick="showView('enquiries')">
         <span class="icon">✉️</span> Enquiries
+      </a>
+      <a class="nav-item" onclick="showView('leads')">
+        <span class="icon">🎯</span> Leads
       </a>
       <div class="nav-section">Help</div>
       <a class="nav-item" onclick="showView('howto')">
@@ -632,6 +642,18 @@
         </div>
       </div>
 
+      <!-- LEADS VIEW -->
+      <div class="view" id="view-leads">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <div style="font-size:0.78rem;color:var(--muted)" id="leadsCount"></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm" onclick="exportLeads()">⬇ Export CSV</button>
+            <button class="btn btn-outline btn-sm" onclick="clearLeads()">Clear All</button>
+          </div>
+        </div>
+        <div id="leadsList"></div>
+      </div>
+
       <!-- ENQUIRIES VIEW -->
       <div class="view" id="view-enquiries">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
@@ -736,7 +758,7 @@ let CACHED_PROPS = [];
 // ═══════════════════════════════════════════════
 //  VIEWS
 // ═══════════════════════════════════════════════
-const titles = { dashboard:'Dashboard', properties:'All Properties', add:'Add Property', howto:'How to Use', analytics:'Analytics', enquiries:'Enquiries' };
+const titles = { dashboard:'Dashboard', properties:'All Properties', add:'Add Property', howto:'How to Use', analytics:'Analytics', enquiries:'Enquiries', leads:'Leads' };
 
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -751,6 +773,7 @@ function showView(name) {
   if (name === 'properties') renderTable();
   if (name === 'analytics') renderAnalytics();
   if (name === 'enquiries') renderEnquiries();
+  if (name === 'leads') renderLeads();
   if (name === 'add') { document.getElementById('topbarTitle').textContent = document.getElementById('f-editId').value ? 'Edit Property' : 'Add Property'; }
 }
 
@@ -1270,6 +1293,7 @@ async function renderAnalytics() {
   const views = getViews();
   const enqs  = getEnquiries();
 
+  const totalLeads  = JSON.parse(localStorage.getItem('bt_leads') || '[]').length;
   const totalViews = Object.values(views).reduce((a, b) => a + b, 0);
   const totalEnqs  = enqs.length;
   const sold       = props.filter(p => p.soldStatus === 'Sold').length;
@@ -1279,6 +1303,7 @@ async function renderAnalytics() {
   document.getElementById('analyticsStats').innerHTML = `
     <div class="analytics-card"><div class="analytics-val">${totalViews}</div><div class="analytics-key">Total Property Views</div></div>
     <div class="analytics-card"><div class="analytics-val">${totalEnqs}</div><div class="analytics-key">Total Enquiries</div></div>
+    <div class="analytics-card"><div class="analytics-val">${totalLeads}</div><div class="analytics-key">Leads Collected</div></div>
     <div class="analytics-card"><div class="analytics-val">${active}</div><div class="analytics-key">Active Listings</div></div>
     <div class="analytics-card"><div class="analytics-val">${sold}</div><div class="analytics-key">Sold</div></div>
     <div class="analytics-card"><div class="analytics-val">${rented}</div><div class="analytics-key">Rented</div></div>
@@ -1307,6 +1332,40 @@ async function renderAnalytics() {
         <div class="bar-count">${enqByProp[p.id]||0}</div>
       </div>`).join('')
     : '<div style="color:var(--muted);font-size:0.82rem">No enquiries yet.</div>';
+}
+
+function renderLeads() {
+  const leads = JSON.parse(localStorage.getItem('bt_leads') || '[]');
+  document.getElementById('leadsCount').textContent = leads.length + ' lead' + (leads.length === 1 ? '' : 's') + ' collected';
+  if (!leads.length) {
+    document.getElementById('leadsList').innerHTML = '<div class="leads-empty">No leads yet. They will appear here when visitors subscribe from the popup on the site.</div>';
+    return;
+  }
+  document.getElementById('leadsList').innerHTML = leads.map(l => `
+    <div class="lead-card">
+      <div>
+        <div class="lead-name">${l.name || 'No name provided'}</div>
+        <div class="lead-email">${l.email}</div>
+      </div>
+      <div class="lead-date">${l.date || ''}</div>
+    </div>`).join('');
+}
+
+function exportLeads() {
+  const leads = JSON.parse(localStorage.getItem('bt_leads') || '[]');
+  if (!leads.length) { toast('No leads to export', 'error'); return; }
+  const csv = 'Name,Email,Date\n' + leads.map(l => `"${l.name||''}","${l.email}","${l.date||''}"`).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'leads_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('Leads exported!');
+}
+
+function clearLeads() {
+  if (!confirm('Clear all leads? This cannot be undone.')) return;
+  localStorage.removeItem('bt_leads');
+  renderLeads();
 }
 
 function renderEnquiries() {
