@@ -906,6 +906,12 @@ function resetFilters() {
   applyFilters();
 }
 
+function soldBadge(p) {
+  if (p.soldStatus === 'Sold') return '<span class="badge-sold">Sold</span>';
+  if (p.soldStatus === 'Rented') return '<span class="badge-rented">Rented</span>';
+  return '';
+}
+
 function rowHTML(p, showActions = false) {
   const img = p.images?.[0] || '';
   const mktBadge = p.market === 'DFW' ? 'badge-dfw' : 'badge-houston';
