@@ -19,17 +19,23 @@
 
   /* ── LOGIN SCREEN ── */
   .login-screen { position:fixed; inset:0; background:var(--dark); z-index:999; display:flex; align-items:center; justify-content:center; padding:24px; }
-  .login-box { background:var(--panel); border:1px solid var(--border); padding:48px 40px; width:100%; max-width:380px; }
+  .login-box { background:var(--panel); border:1px solid var(--border); padding:44px 36px; width:100%; max-width:320px; text-align:center; }
   .login-logo { font-size:0.68rem; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:4px; }
-  .login-sub { font-size:0.75rem; color:var(--muted); margin-bottom:36px; }
-  .login-label { font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:8px; }
-  .login-input { width:100%; background:var(--surface); border:1px solid var(--border); color:var(--text); font-family:'Outfit',sans-serif; font-size:0.9rem; padding:13px 16px; outline:none; transition:border-color 0.25s; letter-spacing:0.1em; }
-  .login-input:focus { border-color:var(--gold); }
-  .login-btn { width:100%; margin-top:14px; background:var(--gold); color:var(--dark); font-family:'Outfit',sans-serif; font-size:0.75rem; letter-spacing:0.14em; text-transform:uppercase; font-weight:700; padding:14px; border:none; cursor:pointer; transition:background 0.2s; }
-  .login-btn:hover { background:var(--gold-light); }
-  .login-error { font-size:0.78rem; color:var(--red); margin-top:12px; min-height:20px; text-align:center; }
-  .login-shake { animation:shake 0.4s ease; }
-  @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
+  .login-sub { font-size:0.75rem; color:var(--muted); margin-bottom:28px; }
+  .pin-dots { display:flex; justify-content:center; gap:14px; margin-bottom:28px; }
+  .pin-dot { width:14px; height:14px; border-radius:50%; border:2px solid var(--border); background:transparent; transition:all 0.2s; }
+  .pin-dot.filled { background:var(--gold); border-color:var(--gold); }
+  .pin-dot.error { background:var(--red); border-color:var(--red); }
+  .pin-pad { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
+  .pin-btn { background:var(--surface); border:1px solid var(--border); color:var(--text); font-family:'Outfit',sans-serif; font-size:1.1rem; font-weight:500; padding:16px; cursor:pointer; transition:all 0.15s; }
+  .pin-btn:hover { background:var(--border); border-color:var(--gold); color:var(--gold); }
+  .pin-btn:active { transform:scale(0.94); }
+  .pin-btn.pin-zero { grid-column:2; }
+  .pin-btn.pin-clear { background:none; border:1px solid var(--border); color:var(--muted); font-size:0.75rem; letter-spacing:0.1em; grid-column:1; }
+  .pin-btn.pin-del { background:none; border:1px solid var(--border); color:var(--muted); font-size:1rem; grid-column:3; }
+  .login-error { font-size:0.78rem; color:var(--red); margin-top:8px; min-height:20px; text-align:center; }
+  .login-shake { animation:login-shake 0.4s ease; }
+  @keyframes login-shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
 
   /* ── LAYOUT ── */
   .app { display:grid; grid-template-columns:260px 1fr; min-height:100vh; }
@@ -236,10 +242,27 @@
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
     <div class="login-logo">Britnae Thomas</div>
-    <div class="login-sub">Admin Panel — Restricted Access</div>
-    <label class="login-label" for="loginPass">Password</label>
-    <input class="login-input" type="password" id="loginPass" placeholder="Enter password" onkeydown="if(event.key==='Enter')attemptLogin()">
-    <button class="login-btn" onclick="attemptLogin()">Enter Admin →</button>
+    <div class="login-sub">Admin Panel — Enter PIN</div>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-pad">
+      <button class="pin-btn" onclick="pinPress('1')">1</button>
+      <button class="pin-btn" onclick="pinPress('2')">2</button>
+      <button class="pin-btn" onclick="pinPress('3')">3</button>
+      <button class="pin-btn" onclick="pinPress('4')">4</button>
+      <button class="pin-btn" onclick="pinPress('5')">5</button>
+      <button class="pin-btn" onclick="pinPress('6')">6</button>
+      <button class="pin-btn" onclick="pinPress('7')">7</button>
+      <button class="pin-btn" onclick="pinPress('8')">8</button>
+      <button class="pin-btn" onclick="pinPress('9')">9</button>
+      <button class="pin-btn pin-clear" onclick="pinClear()">CLR</button>
+      <button class="pin-btn pin-zero" onclick="pinPress('0')">0</button>
+      <button class="pin-btn pin-del" onclick="pinDelete()">⌫</button>
+    </div>
     <div class="login-error" id="loginError"></div>
   </div>
 </div>
@@ -271,7 +294,7 @@
       <a href="index.html" target="_blank" class="site-link" style="margin-bottom:12px">
         <span>↗</span> View Live Site
       </a>
-      <a onclick="localStorage.removeItem('bt_admin_auth'); location.reload();" class="site-link" style="cursor:pointer;color:var(--red);opacity:0.7">
+      <a onclick="sessionStorage.removeItem('bt_admin_auth'); location.reload();" class="site-link" style="cursor:pointer;color:var(--red);opacity:0.7">
         <span>🔒</span> Log Out
       </a>
     </div>
@@ -1157,27 +1180,57 @@ function toast(msg, type = '') {
 // ═══════════════════════════════════════════════
 //  AUTH
 // ═══════════════════════════════════════════════
-const ADMIN_PASSWORD = 'britnae2025';
+// ── PIN CONFIG — change this to your preferred 4-digit PIN ──
+const ADMIN_PIN = '2025';
 const SESSION_KEY = 'bt_admin_auth';
+let currentPin = '';
+
+function pinPress(digit) {
+  if (currentPin.length >= 4) return;
+  currentPin += digit;
+  updateDots();
+  if (currentPin.length === 4) {
+    setTimeout(attemptLogin, 120);
+  }
+}
+
+function pinDelete() {
+  currentPin = currentPin.slice(0, -1);
+  updateDots();
+}
+
+function pinClear() {
+  currentPin = '';
+  updateDots();
+  document.getElementById('loginError').textContent = '';
+}
+
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('d' + i);
+    dot.classList.toggle('filled', i < currentPin.length);
+    dot.classList.remove('error');
+  }
+}
 
 function attemptLogin() {
-  const input = document.getElementById('loginPass').value;
   const errorEl = document.getElementById('loginError');
   const box = document.querySelector('.login-box');
 
-  if (input === ADMIN_PASSWORD) {
-    localStorage.setItem(SESSION_KEY, 'true');
+  if (currentPin === ADMIN_PIN) {
+    sessionStorage.setItem(SESSION_KEY, 'true');
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('appShell').style.display = 'grid';
     errorEl.textContent = '';
     initApp();
   } else {
-    errorEl.textContent = 'Incorrect password. Try again.';
+    // Show error dots
+    for (let i = 0; i < 4; i++) document.getElementById('d' + i).classList.add('error');
+    errorEl.textContent = 'Incorrect PIN. Try again.';
     box.classList.remove('login-shake');
-    void box.offsetWidth; // trigger reflow
+    void box.offsetWidth;
     box.classList.add('login-shake');
-    document.getElementById('loginPass').value = '';
-    document.getElementById('loginPass').focus();
+    setTimeout(() => { currentPin = ''; updateDots(); errorEl.textContent = ''; }, 1000);
   }
 }
 
@@ -1248,12 +1301,10 @@ setTimeout(() => {
 // ═══ AUTH ═══
 
 function checkAuth() {
-  if (localStorage.getItem(SESSION_KEY) === 'true') {
+  if (sessionStorage.getItem(SESSION_KEY) === 'true') {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('appShell').style.display = 'grid';
     initApp();
-  } else {
-    document.getElementById('loginPass').focus();
   }
 }
 
