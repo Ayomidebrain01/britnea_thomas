@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ayomidebrain01.github.io/britnea_thomas/sitemap.xml
