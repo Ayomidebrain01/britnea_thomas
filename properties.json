@@ -244,7 +244,7 @@
     "badge": "$5000 Deposit",
     "price": "Contact for Price",
     "deposit": "$5000",
-    "address": "30 minutes from Dallas,TX (Copy)",
+    "address": "30 minutes from Dallas,TX",
     "area": "",
     "market": "DFW",
     "status": "Move-In Ready",
@@ -271,7 +271,7 @@
       "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772713165/d9otasnbhmhvzz3fu0p2.jpg"
     ],
     "image": "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772713165/d9otasnbhmhvzz3fu0p2.jpg",
-    "video": "https://drive.google.com/uc?export=download&id=1PiEzPDscnuXXD_Y6D6eGE5H-3WY-2aSe",
+    "video": null,
     "tags": [
       "dfw",
       "low-deposit"
