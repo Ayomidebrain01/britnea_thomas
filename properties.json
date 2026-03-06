@@ -356,5 +356,56 @@
       "dfw",
       "low-deposit"
     ]
+  },
+  {
+    "id": 1772787028878,
+    "tag": "Luxury Living",
+    "badge": "$10,000 Deposit",
+    "price": "$672,990",
+    "deposit": "$10,000",
+    "address": "25 min from Dallas, TX",
+    "area": "DFW Area, TX",
+    "market": "DFW",
+    "status": "New Construction",
+    "beds": 4,
+    "baths": 3,
+    "sqft": "2,800",
+    "garage": 2,
+    "map_query": "DFW+Area,+TX",
+    "description": "Experience refined living at its finest. From custom-grade finishes to sophisticated design, every element of this home is crafted with luxury in mind. Located in a community with low tax rates, exemplary schools, and just minutes from luxury shopping and dining.",
+    "features": [
+      "Custom-Grade Finishes",
+      "Sophisticated Design",
+      "Low Tax Rate Community",
+      "Exemplary Schools",
+      "Near Luxury Shopping & Dining",
+      "Private Consultation Available"
+    ],
+    "images": [
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786970/fv2zdul4jaztvdxscctw.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786971/uqcyxivrkksdlyw4i1sq.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786972/dmkqg2y9cfxczvzdkjc5.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786973/h7dk6ckgslwnqgm4wrqh.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786975/qilmue1gacu2mysxmvzb.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786976/eokv2v3xby5d9xjrwmgx.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786977/vzhskgt7gazt7nmmfdij.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786979/xuo6wladl2mraxhz7ovn.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786980/r9jqlrlvlquioaqzceye.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786981/w0jh5n7wwv7qcnbovdmn.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786983/obtmnxixmz314q4gduhs.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786984/g9vsodlkrxha5a7jun7r.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786985/ny3xrxhg8gpye4tgbmji.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786987/kwrt77dsuq28zc5apung.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786989/bqg904pnhh5oxz72ccxf.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786990/e5fohcenj5igilq0mowx.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786991/isffuvhdsw0kphmr3b7f.jpg",
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786993/zviprth1clh69d5de8mu.jpg"
+    ],
+    "image": "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772786970/fv2zdul4jaztvdxscctw.jpg",
+    "video": null,
+    "tags": [
+      "dfw",
+      "new-construction"
+    ]
   }
 ]
