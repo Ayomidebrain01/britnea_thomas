@@ -311,8 +311,36 @@
             <div class="table-title">All Properties</div>
             <input class="search-box" placeholder="Search address, market…" oninput="filterTable(this.value)">
           </div>
+          <!-- FILTER BAR -->
+          <div style="display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center;">
+            <select id="sortSelect" onchange="applyFilters()" style="background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:'Outfit',sans-serif;font-size:0.75rem;padding:7px 12px;cursor:pointer;">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="az">Address: A → Z</option>
+              <option value="za">Address: Z → A</option>
+            </select>
+            <select id="marketFilter" onchange="applyFilters()" style="background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:'Outfit',sans-serif;font-size:0.75rem;padding:7px 12px;cursor:pointer;">
+              <option value="">All Markets</option>
+              <option value="DFW">DFW</option>
+              <option value="Houston">Houston</option>
+              <option value="Austin">Austin</option>
+              <option value="San Antonio">San Antonio</option>
+              <option value="Dallas">Dallas</option>
+              <option value="Fort Worth">Fort Worth</option>
+            </select>
+            <select id="statusFilter" onchange="applyFilters()" style="background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:'Outfit',sans-serif;font-size:0.75rem;padding:7px 12px;cursor:pointer;">
+              <option value="">All Statuses</option>
+              <option value="Available">Available</option>
+              <option value="Under Contract">Under Contract</option>
+              <option value="Sold">Sold</option>
+            </select>
+            <button onclick="resetFilters()" style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;font-family:'Outfit',sans-serif;padding:7px 10px;">✕ Reset</button>
+            <div id="filterCount" style="margin-left:auto;font-size:0.72rem;color:var(--muted);"></div>
+          </div>
           <table><thead><tr>
-            <th>Photo</th><th>Address</th><th>Price</th><th>Market</th><th>Status</th><th>Deposit</th><th>Actions</th>
+            <th>Photo</th><th>Address</th><th>Price</th><th>Market</th><th>Status</th><th>Deposit</th><th>Date Added</th><th>Actions</th>
           </tr></thead>
           <tbody id="propertiesTable"></tbody></table>
           <div id="emptyState" class="empty" style="display:none">
@@ -344,10 +372,20 @@
               </div>
               <div class="field">
                 <label>Market</label>
-                <select id="f-market">
-                  <option value="DFW">DFW</option>
-                  <option value="Houston">Houston</option>
-                </select>
+                <input id="f-market" list="marketOptions" placeholder="e.g. DFW, Houston, Austin…">
+                <datalist id="marketOptions">
+                  <option value="DFW">
+                  <option value="Houston">
+                  <option value="Austin">
+                  <option value="San Antonio">
+                  <option value="Dallas">
+                  <option value="Fort Worth">
+                  <option value="Frisco">
+                  <option value="Plano">
+                  <option value="McKinney">
+                  <option value="The Woodlands">
+                </datalist>
+                <div class="field-hint">Type any city or select a common market</div>
               </div>
               <div class="field">
                 <label>Status</label>
@@ -655,25 +693,72 @@ async function renderDashboard() {
 // ═══════════════════════════════════════════════
 //  TABLE
 // ═══════════════════════════════════════════════
-async function renderTable(filter = '') {
-  const props = (await db.getAll()).filter(p =>
-    !filter || p.address.toLowerCase().includes(filter) || p.market.toLowerCase().includes(filter)
-  );
+let currentSearch = '';
+
+async function renderTable() { applyFilters(); }
+
+async function applyFilters() {
+  const sort = document.getElementById('sortSelect')?.value || 'newest';
+  const market = document.getElementById('marketFilter')?.value || '';
+  const status = document.getElementById('statusFilter')?.value || '';
+
+  let props = await db.getAll();
+
+  if (currentSearch) {
+    props = props.filter(p =>
+      (p.address||'').toLowerCase().includes(currentSearch) ||
+      (p.market||'').toLowerCase().includes(currentSearch)
+    );
+  }
+
+  if (market) props = props.filter(p => p.market === market);
+  if (status) props = props.filter(p => p.status === status);
+
+  props.sort((a, b) => {
+    if (sort === 'newest') return b.id - a.id;
+    if (sort === 'oldest') return a.id - b.id;
+    if (sort === 'price-high') return parsePriceNum(b.price) - parsePriceNum(a.price);
+    if (sort === 'price-low') return parsePriceNum(a.price) - parsePriceNum(b.price);
+    if (sort === 'az') return (a.address||'').localeCompare(b.address||'');
+    if (sort === 'za') return (b.address||'').localeCompare(a.address||'');
+    return 0;
+  });
+
   const tbody = document.getElementById('propertiesTable');
   const empty = document.getElementById('emptyState');
+  const count = document.getElementById('filterCount');
 
   if (!props.length) {
     tbody.innerHTML = '';
     empty.style.display = 'block';
+    if (count) count.textContent = '0 properties';
     return;
   }
+
   empty.style.display = 'none';
+  if (count) count.textContent = `${props.length} propert${props.length === 1 ? 'y' : 'ies'}`;
   tbody.innerHTML = props.map(p => rowHTML(p, true)).join('');
+}
+
+function parsePriceNum(price) {
+  if (!price) return 0;
+  return parseInt(price.replace(/[^0-9]/g, '')) || 0;
+}
+
+function resetFilters() {
+  currentSearch = '';
+  const sb = document.querySelector('.search-box');
+  if (sb) sb.value = '';
+  document.getElementById('sortSelect').value = 'newest';
+  document.getElementById('marketFilter').value = '';
+  document.getElementById('statusFilter').value = '';
+  applyFilters();
 }
 
 function rowHTML(p, showActions = false) {
   const img = p.images?.[0] || '';
   const mktBadge = p.market === 'DFW' ? 'badge-dfw' : 'badge-houston';
+  const dateAdded = p.id ? new Date(p.id).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : '—';
   return `<tr>
     <td>${img ? `<img class="td-img" src="${img}" onerror="this.style.display='none'">` : '—'}</td>
     <td>${p.address}</td>
@@ -681,6 +766,7 @@ function rowHTML(p, showActions = false) {
     <td><span class="td-badge ${mktBadge}">${p.market}</span></td>
     <td>${p.status || '—'}</td>
     <td>${p.deposit}</td>
+    <td style="font-size:0.75rem;color:var(--muted);white-space:nowrap;">${dateAdded}</td>
     ${showActions ? `<td><div class="td-actions">
       <button class="btn btn-outline btn-sm" onclick="editProperty(${p.id})">Edit</button>
       <button class="btn btn-outline btn-sm" id="copy-${p.id}" onclick="duplicateProperty(${p.id}, this)" style="color:var(--gold);border-color:rgba(201,168,76,0.3)">Copy</button>
@@ -689,7 +775,8 @@ function rowHTML(p, showActions = false) {
   </tr>`;
 }
 
-function filterTable(val) { renderTable(val.toLowerCase()); }
+function filterTable(val) { currentSearch = val.toLowerCase(); applyFilters(); }
+
 
 // ═══════════════════════════════════════════════
 //  FORM — INIT
