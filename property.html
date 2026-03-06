@@ -128,6 +128,11 @@
   .pb-btn-primary:hover { background:var(--gold-light); }
   .pb-btn-outline { background:transparent; color:var(--dark); border:1.5px solid var(--dark); transition:all 0.2s; }
   .pb-btn-outline:hover { background:var(--dark); color:white; }
+  .share-toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:var(--dark); color:white; padding:10px 24px; font-size:0.78rem; letter-spacing:0.08em; z-index:9999; opacity:0; transition:opacity 0.3s; pointer-events:none; }
+  .share-toast.show { opacity:1; }
+  .prop-sold-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); z-index:5; pointer-events:none; }
+  .prop-sold-banner { background:#E74C3C; color:white; font-size:1.6rem; font-weight:800; letter-spacing:0.2em; text-transform:uppercase; padding:14px 60px; transform:rotate(-20deg); box-shadow:0 8px 32px rgba(0,0,0,0.4); }
+  .prop-rented-banner { background:#8B5CF6; color:white; font-size:1.6rem; font-weight:800; letter-spacing:0.2em; text-transform:uppercase; padding:14px 60px; transform:rotate(-20deg); box-shadow:0 8px 32px rgba(0,0,0,0.4); }
 
   /* TWO COLUMN LAYOUT */
   .prop-grid { display:grid; grid-template-columns:1fr 380px; gap:40px; align-items:start; padding-top:36px; }
@@ -280,6 +285,40 @@
   @media (max-width:480px) {
     .similar-grid { grid-template-columns:1fr; }
   }
+
+  /* ── DARK MODE ── */
+  body.dark-mode { background: #0E0E0E; color: #F0EDE8; }
+  body.dark-mode nav { background: rgba(6,6,6,0.97); border-bottom-color: rgba(201,168,76,0.3); }
+  body.dark-mode .nav-links a { color: rgba(255,255,255,0.55); }
+  body.dark-mode .mobile-menu { background: rgba(6,6,6,0.99); }
+
+  /* theme toggle button */
+  .theme-toggle { background: none; border: 1px solid rgba(255,255,255,0.2); color: white; width: 36px; height: 36px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  .theme-toggle:hover { border-color: var(--gold); }
+  body:not(.dark-mode) .theme-toggle { border-color: rgba(0,0,0,0.0); color: rgba(255,255,255,0.8); }
+
+  body.dark-mode .price-bar { background: #111; border-bottom-color: #2a2a2a; }
+  body.dark-mode .price-tag { color: #F0EDE8; }
+  body.dark-mode .price-specs-val { color: #F0EDE8; }
+  body.dark-mode .pb-btn-outline { color: #F0EDE8; border-color: rgba(255,255,255,0.3); }
+  body.dark-mode .pb-btn-outline:hover { background: #F0EDE8; color: #0E0E0E; }
+  body.dark-mode .prop-main { background: #0E0E0E; }
+  body.dark-mode .prop-section { background: #1A1A1A; border-color: #2a2a2a; }
+  body.dark-mode .prop-section-title { color: #F0EDE8; border-bottom-color: #2a2a2a; }
+  body.dark-mode .prop-desc { color: #A09880; }
+  body.dark-mode .feat-item { color: #A09880; }
+  body.dark-mode .detail-val { color: #F0EDE8; }
+  body.dark-mode .detail-key { color: #8A8070; }
+  body.dark-mode .contact-card { background: #1A1A1A; border-color: #2a2a2a; }
+  body.dark-mode .cc-section-label { color: #8A8070; }
+  body.dark-mode .cc-btn-outline { color: #F0EDE8; border-color: #444; }
+  body.dark-mode .cc-btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+  body.dark-mode #enq-name, body.dark-mode #enq-email, body.dark-mode #enq-msg { background: #111; border-color: #333; color: #F0EDE8; }
+  body.dark-mode .similar-section { background: #111; }
+  body.dark-mode .sim-card { background: #1A1A1A; }
+  body.dark-mode .sim-price { color: #F0EDE8; }
+  body.dark-mode .sim-addr { color: #8A8070; }
+
 </style>
 </head>
 <body>
@@ -294,6 +333,7 @@
     <li><a href="contact.html">Contact</a></li>
   </ul>
   <a href="contact.html" class="nav-cta">Book Consultation</a>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
   <div class="hamburger" id="hamburger" onclick="toggleMenu()">
     <span></span><span></span><span></span>
   </div>
@@ -451,6 +491,7 @@ function render(prop) {
         <div class="price-bar-actions">
           <a href="contact.html" class="pb-btn pb-btn-primary">Schedule Tour</a>
           <a href="tel:4696164622" class="pb-btn pb-btn-outline">Free Call</a>
+          <button onclick="shareProp()" class="pb-btn pb-btn-outline" title="Share this property">⬆ Share</button>
         </div>
       </div>
     </div>
@@ -529,6 +570,14 @@ function render(prop) {
               <a href="contact.html" class="cc-btn cc-btn-gold">📅 Schedule a Tour</a>
               <a href="tel:4696164622" class="cc-btn cc-btn-dark">📞 Book a Free Call</a>
               <a href="sms:4696164622" class="cc-btn cc-btn-outline">💬 Text 469-616-4622</a>
+              <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px;">
+                <div style="font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin-bottom:12px;">Quick Enquiry</div>
+                <input id="enq-name" placeholder="Your Name" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1px solid var(--border);font-family:'Outfit',sans-serif;font-size:0.85rem;outline:none;background:var(--cream);">
+                <input id="enq-email" placeholder="Email or Phone" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1px solid var(--border);font-family:'Outfit',sans-serif;font-size:0.85rem;outline:none;background:var(--cream);">
+                <textarea id="enq-msg" placeholder="Your message..." rows="3" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1px solid var(--border);font-family:'Outfit',sans-serif;font-size:0.85rem;outline:none;resize:vertical;background:var(--cream);"></textarea>
+                <button onclick="submitEnquiry()" class="cc-btn cc-btn-gold" style="margin-top:0;">Send Enquiry</button>
+                <div id="enq-confirm" style="display:none;text-align:center;color:#22C55E;font-size:0.82rem;margin-top:8px;">✓ Enquiry sent! We'll be in touch soon.</div>
+              </div>
             </div>
             <div class="cc-details">
               ${prop.status ? `<div class="cc-row"><span class="cc-row-key">Status</span><span class="cc-row-val">${prop.status}</span></div>` : ''}
@@ -715,7 +764,15 @@ async function loadProperty() {
     setCached(allArr);
     ALL_PROPERTIES = allArr.map(normalise);
     const prop = ALL_PROPERTIES.find(p => String(p.id) === String(id)) || null;
-    if (prop) try { render(prop); } catch(e) { console.error(e); }
+    if (prop) try {
+      render(prop);
+      // Track page view for analytics
+      try {
+        const v = JSON.parse(localStorage.getItem('bt_prop_views') || '{}');
+        v[prop.id] = (v[prop.id] || 0) + 1;
+        localStorage.setItem('bt_prop_views', JSON.stringify(v));
+      } catch(e) {}
+    } catch(e) { console.error(e); }
     else app.innerHTML = `<div class="not-found"><h2>Property Not Found</h2><p>This listing may have been removed.</p><a href="listings.html" class="btn-primary" style="margin-top:20px;display:inline-block;">Back to Listings</a></div>`;
   } catch(e) {
     if (!cached) app.innerHTML = `<div class="not-found"><h2>Failed to load.</h2><p>Please check your connection.</p><a href="listings.html" class="btn-primary" style="margin-top:20px;display:inline-block;">Back to Listings</a></div>`;
@@ -723,6 +780,55 @@ async function loadProperty() {
 }
 
 loadProperty();
+
+function submitEnquiry() {
+  const name  = document.getElementById('enq-name')?.value.trim();
+  const email = document.getElementById('enq-email')?.value.trim();
+  const msg   = document.getElementById('enq-msg')?.value.trim();
+  if (!name || !email) { alert('Please enter your name and email or phone.'); return; }
+  const propId = new URLSearchParams(window.location.search).get('id');
+  const propAddress = document.querySelector('.prop-address')?.textContent || '';
+  try {
+    const enqs = JSON.parse(localStorage.getItem('bt_enquiries') || '[]');
+    enqs.unshift({ id: Date.now(), name, email, message: msg, propId, propAddress, read: false, date: new Date().toLocaleDateString() });
+    localStorage.setItem('bt_enquiries', JSON.stringify(enqs));
+  } catch(e) {}
+  document.getElementById('enq-name').value = '';
+  document.getElementById('enq-email').value = '';
+  document.getElementById('enq-msg').value = '';
+  document.getElementById('enq-confirm').style.display = 'block';
+  setTimeout(() => { if(document.getElementById('enq-confirm')) document.getElementById('enq-confirm').style.display='none'; }, 4000);
+}
+
+function shareProp() {
+  const url = window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: document.title, url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => {
+      const t = document.getElementById('shareToast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    });
+  }
+}
+</script>
+<div class="share-toast" id="shareToast">✓ Link copied to clipboard</div>
+
+<script>
+  // ── DARK MODE ──
+  (function() {
+    const saved = localStorage.getItem('bt_theme');
+    if (saved === 'dark') {
+      document.body.classList.add('dark-mode');
+      document.getElementById('themeToggle').textContent = '☀️';
+    }
+  })();
+  function toggleTheme() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('bt_theme', isDark ? 'dark' : 'light');
+    document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+  }
 </script>
 </body>
 </html>

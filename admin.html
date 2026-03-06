@@ -18,6 +18,29 @@
   body { font-family:'Outfit',sans-serif; background:var(--dark); color:var(--text); min-height:100vh; }
 
   /* ── LOGIN SCREEN ── */
+  /* ── ANALYTICS ── */
+  .analytics-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:28px; }
+  .analytics-card { background:var(--panel); border:1px solid var(--border); padding:24px 20px; }
+  .analytics-val { font-size:2rem; font-weight:300; color:var(--gold); line-height:1; margin-bottom:4px; }
+  .analytics-key { font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+  .bar-chart { background:var(--panel); border:1px solid var(--border); padding:24px; margin-bottom:28px; }
+  .bar-chart-title { font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:20px; }
+  .bar-row { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .bar-label { font-size:0.78rem; color:var(--text); min-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bar-track { flex:1; background:var(--surface); height:8px; border-radius:0; }
+  .bar-fill { height:8px; background:var(--gold); transition:width 0.6s ease; }
+  .bar-count { font-size:0.75rem; color:var(--muted); min-width:32px; text-align:right; }
+  /* ── ENQUIRIES ── */
+  .enquiry-card { background:var(--panel); border:1px solid var(--border); padding:20px 24px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
+  .enquiry-card.unread { border-left:3px solid var(--gold); }
+  .enquiry-name { font-size:0.9rem; font-weight:600; color:var(--text); margin-bottom:4px; }
+  .enquiry-contact { font-size:0.78rem; color:var(--muted); margin-bottom:8px; }
+  .enquiry-msg { font-size:0.82rem; color:var(--text); line-height:1.6; }
+  .enquiry-meta { font-size:0.68rem; color:var(--muted); text-align:right; white-space:nowrap; }
+  .enquiry-prop { font-size:0.68rem; color:var(--gold); margin-top:4px; }
+  .enq-empty { padding:60px; text-align:center; color:var(--muted); font-size:0.88rem; }
+  .badge-sold { display:inline-block; background:#E74C3C; color:white; font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; padding:2px 7px; border-radius:2px; margin-left:6px; }
+  .badge-rented { display:inline-block; background:#8B5CF6; color:white; font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; padding:2px 7px; border-radius:2px; margin-left:6px; }
   .login-screen { position:fixed; inset:0; background:var(--dark); z-index:999; display:flex; align-items:center; justify-content:center; padding:24px; }
   .login-box { background:var(--panel); border:1px solid var(--border); padding:44px 36px; width:100%; max-width:320px; text-align:center; }
   .login-logo { font-size:0.68rem; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:4px; }
@@ -285,6 +308,13 @@
       <a class="nav-item" onclick="showView('add')">
         <span class="icon">➕</span> Add Property
       </a>
+      <div class="nav-section">Insights</div>
+      <a class="nav-item" onclick="showView('analytics')">
+        <span class="icon">📈</span> Analytics
+      </a>
+      <a class="nav-item" onclick="showView('enquiries')">
+        <span class="icon">✉️</span> Enquiries
+      </a>
       <div class="nav-section">Help</div>
       <a class="nav-item" onclick="showView('howto')">
         <span class="icon">📖</span> How to Use
@@ -417,6 +447,14 @@
                   <option>Move-In Ready</option>
                   <option>To Be Built</option>
                   <option>Under Construction</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Sold / Rented Status</label>
+                <select id="f-sold-status">
+                  <option value="">Active (No Badge)</option>
+                  <option value="Sold">Sold</option>
+                  <option value="Rented">Rented</option>
                 </select>
               </div>
               <div class="field">
@@ -580,6 +618,29 @@
         </div>
       </div>
 
+
+      <!-- ANALYTICS VIEW -->
+      <div class="view" id="view-analytics">
+        <div class="analytics-grid" id="analyticsStats"></div>
+        <div class="bar-chart">
+          <div class="bar-chart-title">Views per Listing</div>
+          <div id="viewsChart"></div>
+        </div>
+        <div class="bar-chart">
+          <div class="bar-chart-title">Enquiries per Listing</div>
+          <div id="enqChart"></div>
+        </div>
+      </div>
+
+      <!-- ENQUIRIES VIEW -->
+      <div class="view" id="view-enquiries">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <div style="font-size:0.78rem;color:var(--muted)" id="enqCount"></div>
+          <button class="btn btn-outline btn-sm" onclick="clearEnquiries()">Clear All</button>
+        </div>
+        <div id="enquiriesList"></div>
+      </div>
+
     </div><!-- /content -->
   </div><!-- /main -->
 </div><!-- /app -->
@@ -675,7 +736,7 @@ let CACHED_PROPS = [];
 // ═══════════════════════════════════════════════
 //  VIEWS
 // ═══════════════════════════════════════════════
-const titles = { dashboard:'Dashboard', properties:'All Properties', add:'Add Property', howto:'How to Use' };
+const titles = { dashboard:'Dashboard', properties:'All Properties', add:'Add Property', howto:'How to Use', analytics:'Analytics', enquiries:'Enquiries' };
 
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -688,6 +749,8 @@ function showView(name) {
 
   if (name === 'dashboard') renderDashboard();
   if (name === 'properties') renderTable();
+  if (name === 'analytics') renderAnalytics();
+  if (name === 'enquiries') renderEnquiries();
   if (name === 'add') { document.getElementById('topbarTitle').textContent = document.getElementById('f-editId').value ? 'Edit Property' : 'Add Property'; }
 }
 
@@ -784,7 +847,7 @@ function rowHTML(p, showActions = false) {
   const dateAdded = p.id ? new Date(p.id).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : '—';
   return `<tr>
     <td>${img ? `<img class="td-img" src="${img}" onerror="this.style.display='none'">` : '—'}</td>
-    <td>${p.address}</td>
+    <td>${p.address}${soldBadge(p)}</td>
     <td class="td-price">${p.price}</td>
     <td><span class="td-badge ${mktBadge}">${p.market}</span></td>
     <td>${p.status || '—'}</td>
@@ -816,6 +879,7 @@ function initForm(prop = null) {
   document.getElementById('f-address').value = prop?.address || '';
   document.getElementById('f-market').value = prop?.market || 'DFW';
   document.getElementById('f-status').value = prop?.status || 'New Construction';
+  document.getElementById('f-sold-status').value = prop?.soldStatus || '';
   document.getElementById('f-tag').value = prop?.tag || '';
   document.getElementById('f-area').value = prop?.area || '';
   document.getElementById('f-beds').value = prop?.beds || '';
@@ -1020,6 +1084,7 @@ async function saveProperty() {
     area: document.getElementById('f-area').value.trim(),
     market,
     status: document.getElementById('f-status').value,
+    soldStatus: document.getElementById('f-sold-status').value,
     beds: parseFloat(document.getElementById('f-beds').value) || 0,
     baths: parseFloat(document.getElementById('f-baths').value) || 0,
     sqft: document.getElementById('f-sqft').value.trim(),
@@ -1175,6 +1240,102 @@ function toast(msg, type = '') {
   el.textContent = msg;
   el.className = 'toast show ' + type;
   setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════════
+//  ANALYTICS
+// ═══════════════════════════════════════════════
+const VIEWS_KEY = 'bt_prop_views';
+const ENQ_KEY   = 'bt_enquiries';
+
+function getViews() { try { return JSON.parse(localStorage.getItem(VIEWS_KEY)) || {}; } catch(e) { return {}; } }
+function getEnquiries() { try { return JSON.parse(localStorage.getItem(ENQ_KEY)) || []; } catch(e) { return []; } }
+
+// Call this from property page to track a view
+window.trackView = function(propId) {
+  const v = getViews();
+  v[propId] = (v[propId] || 0) + 1;
+  localStorage.setItem(VIEWS_KEY, JSON.stringify(v));
+};
+
+// Call this when enquiry form is submitted
+window.trackEnquiry = function(name, email, phone, message, propId, propAddress) {
+  const enqs = getEnquiries();
+  enqs.unshift({ id: Date.now(), name, email, phone, message, propId, propAddress, read: false, date: new Date().toLocaleDateString() });
+  localStorage.setItem(ENQ_KEY, JSON.stringify(enqs));
+};
+
+async function renderAnalytics() {
+  const props = await db.getAll();
+  const views = getViews();
+  const enqs  = getEnquiries();
+
+  const totalViews = Object.values(views).reduce((a, b) => a + b, 0);
+  const totalEnqs  = enqs.length;
+  const sold       = props.filter(p => p.soldStatus === 'Sold').length;
+  const rented     = props.filter(p => p.soldStatus === 'Rented').length;
+  const active     = props.filter(p => !p.soldStatus).length;
+
+  document.getElementById('analyticsStats').innerHTML = `
+    <div class="analytics-card"><div class="analytics-val">${totalViews}</div><div class="analytics-key">Total Property Views</div></div>
+    <div class="analytics-card"><div class="analytics-val">${totalEnqs}</div><div class="analytics-key">Total Enquiries</div></div>
+    <div class="analytics-card"><div class="analytics-val">${active}</div><div class="analytics-key">Active Listings</div></div>
+    <div class="analytics-card"><div class="analytics-val">${sold}</div><div class="analytics-key">Sold</div></div>
+    <div class="analytics-card"><div class="analytics-val">${rented}</div><div class="analytics-key">Rented</div></div>
+  `;
+
+  // Views bar chart
+  const maxViews = Math.max(...props.map(p => views[p.id] || 0), 1);
+  document.getElementById('viewsChart').innerHTML = props.length
+    ? props.map(p => `
+      <div class="bar-row">
+        <div class="bar-label" title="${p.address}">${p.address.split(',')[0]}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${((views[p.id]||0)/maxViews*100).toFixed(1)}%"></div></div>
+        <div class="bar-count">${views[p.id]||0}</div>
+      </div>`).join('')
+    : '<div style="color:var(--muted);font-size:0.82rem">No listings yet.</div>';
+
+  // Enquiries bar chart
+  const enqByProp = {};
+  enqs.forEach(e => { enqByProp[e.propId] = (enqByProp[e.propId]||0)+1; });
+  const maxEnq = Math.max(...props.map(p => enqByProp[p.id]||0), 1);
+  document.getElementById('enqChart').innerHTML = props.length
+    ? props.map(p => `
+      <div class="bar-row">
+        <div class="bar-label" title="${p.address}">${p.address.split(',')[0]}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${((enqByProp[p.id]||0)/maxEnq*100).toFixed(1)}%;background:#22C55E"></div></div>
+        <div class="bar-count">${enqByProp[p.id]||0}</div>
+      </div>`).join('')
+    : '<div style="color:var(--muted);font-size:0.82rem">No enquiries yet.</div>';
+}
+
+function renderEnquiries() {
+  const enqs = getEnquiries();
+  document.getElementById('enqCount').textContent = enqs.length + ' enquir' + (enqs.length === 1 ? 'y' : 'ies');
+  if (!enqs.length) {
+    document.getElementById('enquiriesList').innerHTML = '<div class="enq-empty">No enquiries yet. They will appear here when buyers fill out the contact form.</div>';
+    return;
+  }
+  // Mark all as read when viewed
+  const read = enqs.map(e => ({...e, read: true}));
+  localStorage.setItem(ENQ_KEY, JSON.stringify(read));
+
+  document.getElementById('enquiriesList').innerHTML = enqs.map(e => `
+    <div class="enquiry-card ${e.read ? '' : 'unread'}">
+      <div style="flex:1">
+        <div class="enquiry-name">${e.name || 'Anonymous'}${e.read ? '' : ' <span style="color:var(--gold);font-size:0.65rem">NEW</span>'}</div>
+        <div class="enquiry-contact">${e.email || ''}${e.phone ? ' · ' + e.phone : ''}</div>
+        <div class="enquiry-msg">${e.message || ''}</div>
+        ${e.propAddress ? `<div class="enquiry-prop">Re: ${e.propAddress}</div>` : ''}
+      </div>
+      <div class="enquiry-meta">${e.date || ''}</div>
+    </div>`).join('');
+}
+
+function clearEnquiries() {
+  if (!confirm('Clear all enquiries? This cannot be undone.')) return;
+  localStorage.removeItem(ENQ_KEY);
+  renderEnquiries();
 }
 
 // ═══════════════════════════════════════════════
