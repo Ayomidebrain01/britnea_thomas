@@ -11,35 +11,43 @@ const FILES = {
   leads:      'leads.json',
 };
 
-const cors = {
+const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS'
 };
 
-async function getFile(path, ghHeaders) {
-  const res = await fetch(`${BASE_API}/${path}`, { headers: ghHeaders });
+function setCORS(res) {
+  Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+}
+
+async function getFile(filePath, ghHeaders) {
+  const res = await fetch(`${BASE_API}/${filePath}`, { headers: ghHeaders });
   if (res.status === 404) return { data: [], sha: null };
   const json = await res.json();
   const data = JSON.parse(Buffer.from(json.content, 'base64').toString('utf8'));
   return { data, sha: json.sha };
 }
 
-async function saveFile(path, data, sha, message, ghHeaders) {
+async function saveFile(filePath, data, sha, message, ghHeaders) {
   const content = Buffer.from(JSON.stringify(data, null, 2)).toString('base64');
   const body = { message, content };
   if (sha) body.sha = sha;
-  const res = await fetch(`${BASE_API}/${path}`, {
+  return fetch(`${BASE_API}/${filePath}`, {
     method: 'PUT',
     headers: ghHeaders,
     body: JSON.stringify(body)
   });
-  return res;
 }
 
 export default async function handler(req, res) {
-  Object.entries(cors).forEach(([k, v]) => res.setHeader(k, v));
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  // Always set CORS headers first
+  setCORS(res);
+
+  // Handle preflight immediately — must return 200
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
   const token = process.env.GITHUB_TOKEN;
   if (!token) return res.status(500).json({ error: 'GITHUB_TOKEN not set' });
@@ -51,50 +59,54 @@ export default async function handler(req, res) {
     'User-Agent': 'britnae-admin'
   };
 
-  // Determine which file from URL path
+  // Determine which file from URL
   const url = req.url || '';
   let fileKey = 'properties';
-  if (url.includes('/enquiries')) fileKey = 'enquiries';
-  else if (url.includes('/leads'))     fileKey = 'leads';
-
+  if (url.includes('enquiries')) fileKey = 'enquiries';
+  else if (url.includes('leads')) fileKey = 'leads';
   const filePath = FILES[fileKey];
 
   try {
     // ── GET ──
     if (req.method === 'GET') {
       const ghRes = await fetch(`${BASE_API}/${filePath}`, { headers: ghHeaders });
+      res.setHeader('Cache-Control', 'no-store');
 
       if (ghRes.status === 404) {
-        return res.status(200).json(fileKey === 'properties' ? [] : []);
+        return res.status(200).json([]);
       }
 
       const json = await ghRes.json();
-      res.setHeader('Cache-Control', 'no-store');
 
-      // Admin needs SHA for PUT operations
       if (req.query?.admin === '1') {
         return res.status(200).json(json);
       }
 
-      // Public — return plain array
       const data = JSON.parse(Buffer.from(json.content, 'base64').toString('utf8'));
       return res.status(200).json(data);
     }
 
-    // ── POST — append a new item (enquiries + leads) ──
+    // ── POST — append new item (enquiries + leads) ──
     if (req.method === 'POST') {
-      if (fileKey === 'properties') return res.status(405).json({ error: 'Use PUT for properties' });
-
+      if (fileKey === 'properties') {
+        return res.status(405).json({ error: 'Use PUT for properties' });
+      }
       const { data: existing, sha } = await getFile(filePath, ghHeaders);
-      const newItem = { ...req.body, id: Date.now(), date: new Date().toLocaleDateString('en-US') };
+      const newItem = {
+        ...req.body,
+        id: Date.now(),
+        date: new Date().toLocaleDateString('en-US')
+      };
       const updated = [newItem, ...existing];
-
-      const saveRes = await saveFile(filePath, updated, sha, `Add ${fileKey.slice(0,-1)}`, ghHeaders);
-      const saveData = await saveRes.json();
-      return res.status(saveRes.ok ? 200 : saveRes.status).json(saveData);
+      const saveRes = await saveFile(filePath, updated, sha, `Add ${fileKey.slice(0, -1)}`, ghHeaders);
+      if (saveRes.ok) {
+        return res.status(200).json({ success: true });
+      }
+      const errData = await saveRes.json();
+      return res.status(saveRes.status).json(errData);
     }
 
-    // ── PUT — full replace (properties + admin edits) ──
+    // ── PUT — full replace ──
     if (req.method === 'PUT') {
       const ghRes = await fetch(`${BASE_API}/${filePath}`, {
         method: 'PUT',
