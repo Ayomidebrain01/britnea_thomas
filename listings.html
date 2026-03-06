@@ -312,8 +312,9 @@
       if (!res.ok) throw new Error();
       const fresh = await res.json();
       if (!Array.isArray(fresh)) throw new Error('Invalid data');
-      setCache(fresh);
-      ALL_PROPS = fresh;
+      const sorted = fresh.sort((a, b) => b.id - a.id);
+      setCache(sorted);
+      ALL_PROPS = sorted;
       renderGrid(activeFilter === 'all' ? ALL_PROPS : ALL_PROPS.filter(p => Array.isArray(p.tags) && p.tags.includes(activeFilter)));
     } catch(e) {
       if (!ALL_PROPS.length) {

@@ -663,7 +663,7 @@
       );
       if (!res.ok) return;
       const fresh = await res.json();
-      renderShowcase(fresh);
+      renderShowcase(fresh.sort((a, b) => b.id - a.id));
     } catch(e) {}
   }
 
