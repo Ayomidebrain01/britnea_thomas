@@ -215,9 +215,12 @@
 
   /* RESPONSIVE */
   @media (max-width:1024px) {
-    .prop-grid { grid-template-columns:1fr; }
-    .prop-right { position:static; order:-1; }
+    .prop-grid { grid-template-columns:1fr; display:flex; flex-direction:column; }
+    .prop-right { position:static; order:3; }
+    .prop-left { order:1; }
+    .prop-similar { order:4; }
     .price-bar-specs { display:none; }
+    .prop-left .prop-section:last-of-type { margin-bottom:0; }
   }
   @media (max-width:768px) {
     nav { padding:16px 20px; }
@@ -465,32 +468,6 @@ function render(prop) {
             </div>
           </div>` : ''}
 
-          <!-- SIMILAR -->
-          ${similar.length ? `
-          <div style="margin-top:36px;">
-            <div style="font-size:1rem;font-weight:600;color:var(--dark);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);">Similar Properties</div>
-            <div class="similar-grid">
-              ${similar.map(s => {
-                const si = Array.isArray(s.images) ? s.images : [];
-                return `<a href="property.html?id=${s.id}" class="sim-card">
-                  <div class="sim-img">
-                    ${si[0] ? `<img src="${si[0]}" alt="${s.address}">` : '<div style="background:var(--border);height:100%;"></div>'}
-                    <div class="sim-tag">${s.tag || s.market || ''}</div>
-                  </div>
-                  <div class="sim-body">
-                    <div class="sim-price">${s.price}</div>
-                    <div class="sim-addr">${s.address}</div>
-                    <div class="sim-specs">
-                      ${s.beds ? `<div class="sim-spec"><span style="color:var(--gold)">●</span>${s.beds} bd</div>` : ''}
-                      ${s.baths ? `<div class="sim-spec"><span style="color:var(--gold)">●</span>${s.baths} ba</div>` : ''}
-                      ${s.sqft ? `<div class="sim-spec"><span style="color:var(--gold)">●</span>${s.sqft} sqft</div>` : ''}
-                    </div>
-                  </div>
-                </a>`;
-              }).join('')}
-            </div>
-          </div>` : ''}
-
         </div><!-- end prop-left -->
 
         <!-- RIGHT SIDEBAR -->
@@ -526,6 +503,34 @@ function render(prop) {
             </div>
           </div>
         </div>
+
+        </div><!-- end prop-right -->
+
+        <!-- SIMILAR PROPERTIES -->
+        ${similar.length ? `
+        <div class="prop-similar">
+          <div style="font-size:1rem;font-weight:600;color:var(--dark);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);">Similar Properties</div>
+          <div class="similar-grid">
+            ${similar.map(s => {
+              const si = Array.isArray(s.images) ? s.images : [];
+              return `<a href="property.html?id=${s.id}" class="sim-card">
+                <div class="sim-img">
+                  ${si[0] ? `<img src="${si[0]}" alt="${s.address}">` : '<div style="background:var(--border);height:100%;"></div>'}
+                  <div class="sim-tag">${s.tag || s.market || ''}</div>
+                </div>
+                <div class="sim-body">
+                  <div class="sim-price">${s.price}</div>
+                  <div class="sim-addr">${s.address}</div>
+                  <div class="sim-specs">
+                    ${s.beds ? `<div class="sim-spec"><span style="color:var(--gold)">●</span>${s.beds} bd</div>` : ''}
+                    ${s.baths ? `<div class="sim-spec"><span style="color:var(--gold)">●</span>${s.baths} ba</div>` : ''}
+                    ${s.sqft ? `<div class="sim-spec"><span style="color:var(--gold)">●</span>${s.sqft} sqft</div>` : ''}
+                  </div>
+                </div>
+              </a>`;
+            }).join('')}
+          </div>
+        </div>` : ''}
 
       </div><!-- end prop-grid -->
     </div><!-- end prop-content -->

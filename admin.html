@@ -427,13 +427,30 @@
             <div class="video-type-row">
               <button class="video-type-btn active" onclick="setVideoType('youtube', this)">▶ YouTube</button>
               <button class="video-type-btn" onclick="setVideoType('vimeo', this)">▶ Vimeo</button>
-              <button class="video-type-btn" onclick="setVideoType('mp4', this)">📁 Direct MP4</button>
+              <button class="video-type-btn" onclick="setVideoType('mp4', this)">📁 Upload Video</button>
               <button class="video-type-btn" onclick="setVideoType('none', this)">✕ No Video</button>
             </div>
             <div class="field" id="videoField">
               <label id="videoLabel">YouTube Embed URL</label>
               <input id="f-video" placeholder="https://www.youtube.com/embed/VIDEO_ID">
               <div class="field-hint" id="videoHint">Go to YouTube → Share → Embed → copy the src URL</div>
+            </div>
+            <!-- MP4 Upload UI -->
+            <div id="videoUploadField" style="display:none;">
+              <label style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:block;">Upload Video File</label>
+              <input type="file" accept="video/*" id="videoFileInput" style="display:none" onchange="handleVideoUpload(this.files[0])">
+              <button class="add-img-btn" onclick="document.getElementById('videoFileInput').click()" id="videoUploadBtn">📁 Choose Video File</button>
+              <div class="field-hint" style="margin-top:6px;">MP4, MOV, AVI supported · Uploads to Cloudinary</div>
+              <div id="videoUploadProgress" style="display:none;margin-top:10px;">
+                <div style="background:var(--border);height:4px;border-radius:2px;overflow:hidden;">
+                  <div id="videoUploadBar" style="height:100%;background:var(--gold);width:0%;transition:width 0.3s;"></div>
+                </div>
+                <div id="videoUploadStatus" style="font-size:0.75rem;color:var(--muted);margin-top:6px;">Uploading...</div>
+              </div>
+              <div id="videoPreview" style="display:none;margin-top:12px;">
+                <video id="videoPreviewEl" controls style="width:100%;max-height:200px;background:#000;"></video>
+                <button onclick="clearVideo()" style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;margin-top:6px;font-family:'Outfit',sans-serif;">✕ Remove video</button>
+              </div>
             </div>
           </div>
 
@@ -767,18 +784,83 @@ function setVideoType(type, btn, silent = false) {
     });
   }
   const field = document.getElementById('videoField');
+  const uploadField = document.getElementById('videoUploadField');
   const label = document.getElementById('videoLabel');
   const hint = document.getElementById('videoHint');
   const input = document.getElementById('f-video');
+
+  // Hide both first
+  field.style.display = 'none';
+  uploadField.style.display = 'none';
+
   if (type === 'none') {
-    field.style.display = 'none';
     input.value = '';
+  } else if (type === 'mp4') {
+    uploadField.style.display = 'block';
+    // If there's already a video URL saved, show preview
+    if (input.value && input.value.startsWith('http')) {
+      document.getElementById('videoPreview').style.display = 'block';
+      document.getElementById('videoPreviewEl').src = input.value;
+    }
   } else {
     field.style.display = 'flex';
     if (type === 'youtube') { label.textContent = 'YouTube Embed URL'; hint.textContent = 'Go to YouTube → Share → Embed → copy the src= URL'; input.placeholder = 'https://www.youtube.com/embed/VIDEO_ID'; }
     if (type === 'vimeo') { label.textContent = 'Vimeo Embed URL'; hint.textContent = 'Vimeo → Share → Embed → copy the src= URL'; input.placeholder = 'https://player.vimeo.com/video/VIDEO_ID'; }
-    if (type === 'mp4') { label.textContent = 'Direct MP4 URL'; hint.textContent = 'Link to a hosted .mp4 file (your server, Dropbox, etc.)'; input.placeholder = 'https://example.com/walkthrough.mp4'; }
   }
+}
+
+async function handleVideoUpload(file) {
+  if (!file) return;
+  const progress = document.getElementById('videoUploadProgress');
+  const bar = document.getElementById('videoUploadBar');
+  const status = document.getElementById('videoUploadStatus');
+  const btn = document.getElementById('videoUploadBtn');
+
+  progress.style.display = 'block';
+  btn.disabled = true;
+  btn.textContent = '⏳ Uploading...';
+  bar.style.width = '30%';
+  status.textContent = 'Uploading to Cloudinary...';
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_PRESET);
+    formData.append('resource_type', 'video');
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/video/upload`, {
+      method: 'POST',
+      body: formData
+    });
+
+    bar.style.width = '90%';
+    if (!res.ok) throw new Error('Upload failed');
+    const data = await res.json();
+    const url = data.secure_url;
+
+    document.getElementById('f-video').value = url;
+    bar.style.width = '100%';
+    status.textContent = '✅ Video uploaded!';
+
+    // Show preview
+    document.getElementById('videoPreview').style.display = 'block';
+    document.getElementById('videoPreviewEl').src = url;
+
+    setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 1500);
+  } catch(e) {
+    status.textContent = '✕ Upload failed. Try again.';
+    bar.style.background = '#e74c3c';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '📁 Choose Another Video';
+}
+
+function clearVideo() {
+  document.getElementById('f-video').value = '';
+  document.getElementById('videoPreview').style.display = 'none';
+  document.getElementById('videoPreviewEl').src = '';
+  document.getElementById('videoUploadBtn').textContent = '📁 Choose Video File';
 }
 
 // ═══════════════════════════════════════════════
