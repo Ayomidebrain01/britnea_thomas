@@ -375,13 +375,23 @@ function render(prop) {
                 : `<div class="gallery-video-wrap"><video controls playsinline style="width:100%;height:100%;object-fit:cover;"><source src="${prop.video}" type="video/mp4"></video></div>`)
             : imgs[0] ? `<img src="${imgs[0]}" alt="${prop.address}">` : ''}
         </div>
-        ${imgs[1] ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,1)"><img src="${imgs[1]}" alt="View 2"></div>` : ''}
-        ${imgs[2] ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,2)"><img src="${imgs[2]}" alt="View 3"></div>` : ''}
-        ${imgs[3] && !imgs[4]
-          ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,3)"><img src="${imgs[3]}" alt="View 4"></div>`
-          : imgs[3]
-            ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,3)"><img src="${imgs[3]}" alt="More" style="filter:brightness(0.4)"><div class="photo-grid-more"><span>+${imgs.length-3} Photos</span></div></div>`
-            : ''}
+        ${prop.video ? `
+          ${imgs[0] ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,0)"><img src="${imgs[0]}" alt="View 1"></div>` : ''}
+          ${imgs[1] ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,1)"><img src="${imgs[1]}" alt="View 2"></div>` : ''}
+          ${imgs[2] && !imgs[3]
+            ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,2)"><img src="${imgs[2]}" alt="View 3"></div>`
+            : imgs[2]
+              ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,2)"><img src="${imgs[2]}" alt="More" style="filter:brightness(0.4)"><div class="photo-grid-more"><span>+${imgs.length-2} Photos</span></div></div>`
+              : ''}
+        ` : `
+          ${imgs[1] ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,1)"><img src="${imgs[1]}" alt="View 2"></div>` : ''}
+          ${imgs[2] ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,2)"><img src="${imgs[2]}" alt="View 3"></div>` : ''}
+          ${imgs[3] && !imgs[4]
+            ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,3)"><img src="${imgs[3]}" alt="View 4"></div>`
+            : imgs[3]
+              ? `<div class="photo-grid-thumb" onclick="openLightbox(CURRENT_IMAGES,3)"><img src="${imgs[3]}" alt="More" style="filter:brightness(0.4)"><div class="photo-grid-more"><span>+${imgs.length-3} Photos</span></div></div>`
+              : ''}
+        `}
       </div>
       ${imgs.length > 1 ? `<button class="view-all-btn" onclick="openLightbox(CURRENT_IMAGES,0)">&#9776; View All ${imgs.length} Photos</button>` : ''}
     </div>
