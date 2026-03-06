@@ -119,5 +119,44 @@
       "dfw",
       "low-deposit"
     ]
+  },
+  {
+    "id": 1772757126737,
+    "tag": "Copy of Luxury Living",
+    "badge": "$5000 Deposit",
+    "price": "Contact for Price",
+    "deposit": "$5000",
+    "address": "30 minutes from Dallas,TX (Copy)",
+    "area": "",
+    "market": "DFW",
+    "status": "Move-In Ready",
+    "beds": 4,
+    "baths": 3,
+    "sqft": "",
+    "garage": 1,
+    "map_query": "",
+    "description": "Luxury living with space to entertain and relax. 4 spacious bedrooms, 3 beautiful bathrooms, and an entertainment room designed for movie nights and game days. This home blends custom-grade finishes with thoughtful design, creating the perfect space for family, friends, and unforgettable gatherings. Step outside and enjoy resort-style amenities including a lazy river, scenic walking trails, and community spaces that make every day feel like a getaway. A home that offers comfort, style, and a lifestyle you deserve.",
+    "features": [
+      "4 Spacious Bedrooms",
+      "3 Beautiful Bathrooms",
+      "Entertainment Room",
+      "Custom-Grade Finishes",
+      "Resort-Style Amenities",
+      "Lazy River",
+      "Scenic Walking Trails",
+      "Community Spaces",
+      "Custom Grade Finishes",
+      "Movie & Game Room",
+      "Luxury Finishes"
+    ],
+    "images": [
+      "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772713165/d9otasnbhmhvzz3fu0p2.jpg"
+    ],
+    "image": "https://res.cloudinary.com/dtjgyatmv/image/upload/v1772713165/d9otasnbhmhvzz3fu0p2.jpg",
+    "video": "https://drive.google.com/uc?export=download&id=1PiEzPDscnuXXD_Y6D6eGE5H-3WY-2aSe",
+    "tags": [
+      "dfw",
+      "low-deposit"
+    ]
   }
 ]
